@@ -1,5 +1,3 @@
-#define ATTEMPT_NUM 3
-
 // Tramas I (informação)
 #define SET_SIZE 5  // tamanho em bytes da trama SET
 #define UA_SIZE 5  // tamanho em bytes da trama UA

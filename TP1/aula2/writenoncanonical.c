@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "messages.h"
 
 #define BAUDRATE B38400
 #define MODEMDEVICE "/dev/ttyS1"
