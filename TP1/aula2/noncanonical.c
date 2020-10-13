@@ -15,7 +15,7 @@
 #define FALSE 0
 #define TRUE 1
 
-volatile int STOP=FALSE;
+volatile int DONE=FALSE;
 
 int main(int argc, char** argv)
 {
@@ -76,12 +76,12 @@ int main(int argc, char** argv)
 
 
 
-    while (STOP==FALSE) {       /* loop for input */
+    while (DONE==FALSE) {       /* loop for input */
       res = read(fd,buf,255);   /* returns after 1 char has been input */
       buf[res]=0;               /* so we can printf... */
 
       printf(":%s:%d\n", buf, res);
-      if (buf[res-1]=='\n') STOP=TRUE;
+      if (buf[res-1]=='\n') DONE=TRUE;
     }
 
 		printf("content of buf %s", buf);

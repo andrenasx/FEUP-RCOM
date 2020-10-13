@@ -16,8 +16,6 @@
 #define FALSE 0
 #define TRUE 1
 
-volatile int STOP=FALSE;
-
 int main(int argc, char** argv)
 {
     int fd,c, res;

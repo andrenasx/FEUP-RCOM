@@ -14,4 +14,4 @@ enum states {START, FLAG_RCV, A_RCV, C_RCV, BCC_OK, STOP};
 
 int sendSET(int fd);
 int sendUA(int fd);
-int processMSG(enum states state, char* check, char byte);
+int processSET(enum states state, char* check, char byte);
