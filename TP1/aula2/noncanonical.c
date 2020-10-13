@@ -78,24 +78,18 @@ int main(int argc, char** argv)
     enum states state = START;
     
     while (state != STOP) {       /* loop for input */
-      res = read(fd,buf,1);   /* returns after 1 char has been input */
+      res = read(fd,byte[0],1);   /* returns after 1 char has been input */
                               /* so we can printf... */
 
-      printf(":%s:%d\n", buf[0]);
+      printf(":%s:%d\n", byte[0]);
       
-      processSET(state, check, byte);
+      processSET(&state, check, byte[0]);
       if(state == STOP)
         break;
     }
 
-    byte[0] = FLAG;
-    byte[1] = A_ER;
-    byte[2] = C_UA;
-    byte[3] = BCC(A_ER, C_UA);
-    byte[4] = FLAG;
-
 		printf("content of buf %s", buf);
-    res = write(fd,byte,UA_SIZE);   
+    res = sendUA(fd);
     printf("%d bytes written\n", res);
 
 
