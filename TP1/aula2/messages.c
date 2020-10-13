@@ -1,12 +1,12 @@
 #include "messages.h"
 
 int sendSET(int fd) {
-    unsigned char set[5] = {FLAG, A_ER, C_SET, BCC(A_ER, C_SET), FLAG);
+    unsigned char set[5] = {FLAG, A_ER, C_SET, BCC(A_ER, C_SET), FLAG};
     return write(fd, set, SET_SIZE);
 }
 
 int sendUA(int fd){
-    unsigned char set[5] = {FLAG, A_RE, C_UA, BCC(A_RE, C_UA), FLAG);
+    unsigned char set[5] = {FLAG, A_RE, C_UA, BCC(A_RE, C_UA), FLAG};
     return write(fd, set, SET_SIZE);
 }
 
@@ -61,7 +61,7 @@ int processSET(enum states state, char* check, char byte){
     }
 }
 
-int processSET(enum states state, char* check, char byte){
+int processUA(enum states state, char* check, char byte){
     switch (*state) {
         case START:
             if (byte == FLAG) *state = FLAG_RCV;    
