@@ -16,4 +16,4 @@ noncanonical: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $@.c $(OBJ) -lm
 
 clean:
-	@rm $(TARGETS)
+	@rm $(TARGETS) $(OBJ)

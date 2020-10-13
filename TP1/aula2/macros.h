@@ -1,7 +1,6 @@
-// Tramas I (informação)
+// Tramas de Supervisao (S) e Não Numeradas (U)
 #define SET_SIZE 5  // tamanho em bytes da trama SET
 #define UA_SIZE 5  // tamanho em bytes da trama UA
-
 
 #define FLAG 0b01111110  // (0x7E) flag de inicio e fim
 

@@ -20,8 +20,8 @@
 int alarme=0, count=0;
 
 void atende(){
-  alarme=1;
-  printf("alarme # %d\n", ++count);
+	alarme=1;
+	printf("alarme # %d\n", ++count);
 }
 
 int main(int argc, char** argv)
@@ -73,32 +73,32 @@ int main(int argc, char** argv)
     tcflush(fd, TCIOFLUSH);
 
     if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
-      perror("tcsetattr");
-      exit(-1);
+		perror("tcsetattr");
+		exit(-1);
     }
 
     printf("New termios structure set\n");
 
     (void) signal(SIGALRM, atende);
 
-    unsigned char rcv_ua[8];
+    unsigned char byte;
 
     do {
-      if (sendSET(fd)==-1) printf("Error sending SET");
-      alarm(3);
-      alarme=0;
-      enum states state = START;
-      char check[2];
-      while(state!=STOP && !alarme) {
-        read(fd, &rcv_ua, 1);
-        processUA(&state, check, rcv_ua[0]);
-      }
-      if (alarme) printf("Timed out! Retrying");
+		if (sendSET(fd)==-1) printf("Error sending SET");
+		alarm(3);
+		alarme=0;
+		enum states state = START;
+		unsigned char check[2];
+		while(state!=STOP && !alarme) {
+			read(fd, &byte, 1);
+			processUA(&state, check, &byte);
+		}
+		if (alarme) printf("Timed out! Retrying");
     } while(count<3 && alarme);
    
     if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
-      perror("tcsetattr");
-      exit(-1);
+		perror("tcsetattr");
+		exit(-1);
     }
 
     close(fd);

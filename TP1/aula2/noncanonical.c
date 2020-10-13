@@ -21,7 +21,6 @@ int main(int argc, char** argv)
 {
     int fd,c, res;
     struct termios oldtio,newtio;
-    char buf[255];
 
     if ( (argc < 2) || 
   	    ((strcmp("/dev/ttyS10", argv[1])!=0) && 
@@ -74,21 +73,16 @@ int main(int argc, char** argv)
 
     printf("New termios structure set\n");
 
-    char check[2], byte[255];
+    unsigned char check[2];
+    unsigned char byte;
     enum states state = START;
     
     while (state != STOP) {       /* loop for input */
-      res = read(fd,byte[0],1);   /* returns after 1 char has been input */
-                              /* so we can printf... */
-
-      printf(":%s:%d\n", byte[0]);
-      
-      processSET(&state, check, byte[0]);
-      if(state == STOP)
-        break;
+		res = read(fd,&byte,1);   /* returns after 1 char has been input */
+								/* so we can printf... */
+		processSET(&state, check, &byte);
     }
-
-		printf("content of buf %s", buf);
+    
     res = sendUA(fd);
     printf("%d bytes written\n", res);
 
