@@ -74,18 +74,28 @@ int main(int argc, char** argv)
 
     printf("New termios structure set\n");
 
+    char check[2], byte[255];
+    enum states state = START;
+    
+    while (state != STOP) {       /* loop for input */
+      res = read(fd,buf,1);   /* returns after 1 char has been input */
+                              /* so we can printf... */
 
-
-    while (DONE==FALSE) {       /* loop for input */
-      res = read(fd,buf,255);   /* returns after 1 char has been input */
-      buf[res]=0;               /* so we can printf... */
-
-      printf(":%s:%d\n", buf, res);
-      if (buf[res-1]=='\n') DONE=TRUE;
+      printf(":%s:%d\n", buf[0]);
+      
+      processSET(state, check, byte);
+      if(state == STOP)
+        break;
     }
 
+    byte[0] = FLAG;
+    byte[1] = A_ER;
+    byte[2] = C_UA;
+    byte[3] = BCC(A_ER, C_UA);
+    byte[4] = FLAG;
+
 		printf("content of buf %s", buf);
-    res = write(fd,buf,strlen(buf));   
+    res = write(fd,byte,UA_SIZE);   
     printf("%d bytes written\n", res);
 
 
