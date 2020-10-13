@@ -16,11 +16,17 @@
 #define FALSE 0
 #define TRUE 1
 
+int alarme=0, count=0;
+
+void atende(){
+  alarme=1;
+  printf("alarme # %d\n", ++count);
+}
+
 int main(int argc, char** argv)
 {
     int fd,c, res;
     struct termios oldtio,newtio;
-    char buf[255];
     int i, sum = 0, speed = 0;
     
     if ( (argc < 2) || 
@@ -63,8 +69,6 @@ int main(int argc, char** argv)
     leitura do(s) pr�ximo(s) caracter(es)
   */
 
-
-
     tcflush(fd, TCIOFLUSH);
 
     if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
@@ -74,24 +78,27 @@ int main(int argc, char** argv)
 
     printf("New termios structure set\n");
 
-    printf("Message: ");
-    fgets(buf,255,stdin);
-    res = write(fd,buf,strlen(buf));   
-    printf("%d bytes written\n", res);
- 
-    char replybuffer[255];
-    res = read(fd, replybuffer, 255);
-    printf("Message received: %s\n ",replybuffer);
+    (void) signal(SIGALRM, atende);
 
+    unsigned char rcv_ua[8];
 
+    do {
+      if (sendSET(fd)==-1=) printf("Error sending SET");
+      alarm(3);
+      alarme=0;
+      states state = START;
+      char check[2];
+      while(state!=STOP && !alarme) {
+        read(fd, &rcv_ua, 1);
+        processUA(&state, check, rcv_ua[0]);
+      }
+      if (alarme) printf("Timed out! Retrying");
+    } while(count<3 && alarme);
    
     if ( tcsetattr(fd,TCSANOW,&oldtio) == -1) {
       perror("tcsetattr");
       exit(-1);
     }
-
-
-
 
     close(fd);
     return 0;
