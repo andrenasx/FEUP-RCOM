@@ -10,7 +10,7 @@ int sendUA(int fd){
     return write(fd, set, SET_SIZE);
 }
 
-int processSET(enum states state, char* check, char byte){
+int processSET(enum states *state, char* check, char byte){
     switch (*state) {
         case START:
             if (byte == FLAG) *state = FLAG_RCV;    
@@ -21,7 +21,7 @@ int processSET(enum states state, char* check, char byte){
                 check[0] = byte;
             }
             else if (byte!= FLAG){
-                *state = Start;
+                *state = START;
             }
             break;
         case A_RCV:
@@ -33,7 +33,7 @@ int processSET(enum states state, char* check, char byte){
                 *state = FLAG_RCV;
             }
             else{
-                *state = Start;
+                *state = START;
             }
             break;
         case C_RCV:
@@ -44,7 +44,7 @@ int processSET(enum states state, char* check, char byte){
                 *state = FLAG_RCV;
             }
             else{
-                *state = Start;
+                *state = START;
             }
             // precisa de valores de A & C
             break;
@@ -53,15 +53,15 @@ int processSET(enum states state, char* check, char byte){
                 *state = STOP;
             }
             else{
-                *state = Start;
+                *state = START;
             }
             break;
-        case DONE:
+        case STOP:
             break;
     }
 }
 
-int processUA(enum states state, char* check, char byte){
+int processUA(enum states *state, char* check, char byte){
     switch (*state) {
         case START:
             if (byte == FLAG) *state = FLAG_RCV;    
@@ -72,7 +72,7 @@ int processUA(enum states state, char* check, char byte){
                 check[0] = byte;
             }
             else if (byte!= FLAG){
-                *state = Start;
+                *state = START;
             }
             break;
         case A_RCV:
@@ -84,7 +84,7 @@ int processUA(enum states state, char* check, char byte){
                 *state = FLAG_RCV;
             }
             else{
-                *state = Start;
+                *state = START;
             }
             break;
         case C_RCV:
@@ -95,7 +95,7 @@ int processUA(enum states state, char* check, char byte){
                 *state = FLAG_RCV;
             }
             else{
-                *state = Start;
+                *state = START;
             }
             // precisa de valores de A & C
             break;
@@ -104,10 +104,10 @@ int processUA(enum states state, char* check, char byte){
                 *state = STOP;
             }
             else{
-                *state = Start;
+                *state = START;
             }
             break;
-        case DONE:
+        case STOP:
             break;
     }
 }
