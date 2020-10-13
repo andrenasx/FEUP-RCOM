@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include "messages.h"
 
 #define BAUDRATE B38400
@@ -83,10 +84,10 @@ int main(int argc, char** argv)
     unsigned char rcv_ua[8];
 
     do {
-      if (sendSET(fd)==-1=) printf("Error sending SET");
+      if (sendSET(fd)==-1) printf("Error sending SET");
       alarm(3);
       alarme=0;
-      states state = START;
+      enum states state = START;
       char check[2];
       while(state!=STOP && !alarme) {
         read(fd, &rcv_ua, 1);
