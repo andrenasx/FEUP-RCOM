@@ -17,11 +17,11 @@
 #define FALSE 0
 #define TRUE 1
 
-int alarme=0, count=0;
+int alarme=0, count=1;
 
 void atende(){
 	alarme=1;
-	printf("alarme # %d\n", ++count);
+	printf("alarme # %d\n", count++);
 }
 
 int main(int argc, char** argv)
@@ -75,29 +75,36 @@ int main(int argc, char** argv)
 
 	printf("New termios structure set\n");
 
-	(void) signal(SIGALRM, atende);
+	struct sigaction sa;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_handler = atende;
+    sa.sa_flags = 0;
+
+    sigaction(SIGALRM, &sa, NULL);
 
 	unsigned char byte;
 
 	do {
 		if ((res=sendSET(fd)) == -1)
-			printf("Error sending SET");
+			printf("Error sending SET\n");
 		else
 			printf("%d SET bytes written\n", res);
 
 		alarm(3);
 		alarme=0;
-		
+
 		enum states state = START;
 		unsigned char check[2];
 		while(state!=STOP && !alarme) {
 			if (read(fd, &byte, 1) == -1)
-				printf("Error reading UA byte");
-			else 
-				processUA(&state, check, &byte);
+				printf("Error reading UA byte\n");
+			else{
+				//printf("Byte:\t%#4.2x\n", byte);
+				processUA(&state, check, byte);
+			}
 		}
-		if (alarme) printf("Timed out! Retrying");
-	} while(count<3 && alarme);
+		if (alarme) printf("Timed out! Retrying\n");
+	} while(count<4 && alarme);
    
 
 	if (tcsetattr(fd,TCSANOW,&oldtio) == -1) {

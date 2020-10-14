@@ -14,5 +14,5 @@ enum states {START, FLAG_RCV, A_RCV, C_RCV, BCC_OK, STOP};
 
 int sendSET(int fd);
 int sendUA(int fd);
-void processSET(enum states *state, unsigned char* check, unsigned char* byte);
-void processUA(enum states *state, unsigned char* check, unsigned char* byte);
+void processSET(enum states *state, unsigned char *check, unsigned char byte);
+void processUA(enum states *state, unsigned char *check, unsigned char byte);

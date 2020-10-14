@@ -10,31 +10,31 @@ int sendUA(int fd){
     return write(fd, set, UA_SIZE);
 }
 
-void processSET(enum states *state, unsigned char *check, unsigned char *byte){
+void processSET(enum states *state, unsigned char *check, unsigned char byte){
     switch (*state) {
         case START:
-            if (*byte == FLAG) {
+            if (byte == FLAG) {
                 *state = FLAG_RCV;
-                printf("F:\t%#4.2x\n", *byte);
+                printf("F:\t%#4.2x\n", byte);
             }
             break;
         case FLAG_RCV:
-            if (*byte == A_ER) {
+            if (byte == A_ER) {
                 *state = A_RCV;
-                check[0] = *byte;
-                printf("A:\t%#4.2x\n", *byte);
+                check[0] = byte;
+                printf("A:\t%#4.2x\n", byte);
             }
-            else if (*byte!= FLAG){
+            else if (byte!= FLAG){
                 *state = START;
             }
             break;
         case A_RCV:
-            if (*byte == C_SET) {
+            if (byte == C_SET) {
                 *state = C_RCV;
-                check[1] = *byte;
-                printf("C:\t%#4.2x\n", *byte);
+                check[1] = byte;
+                printf("C:\t%#4.2x\n", byte);
             }
-            else if (*byte == FLAG){
+            else if (byte == FLAG){
                 *state = FLAG_RCV;
             }
             else{
@@ -42,11 +42,11 @@ void processSET(enum states *state, unsigned char *check, unsigned char *byte){
             }
             break;
         case C_RCV:
-            if (*byte == BCC(check[0],check[1])){
+            if (byte == BCC(check[0],check[1])){
                 *state = BCC_OK;
-                printf("BCC1:\t%#4.2x\n", *byte);
+                printf("BCC1:\t%#4.2x\n", byte);
             }
-            else if (*byte == FLAG){
+            else if (byte == FLAG){
                 *state = FLAG_RCV;
             }
             else{
@@ -54,9 +54,9 @@ void processSET(enum states *state, unsigned char *check, unsigned char *byte){
             }
             break;
         case BCC_OK:
-            if (*byte == FLAG){
+            if (byte == FLAG){
                 *state = STOP;
-                printf("F:\t%#4.2x\n", *byte);
+                printf("F:\t%#4.2x\n", byte);
             }
             else{
                 *state = START;
@@ -67,31 +67,31 @@ void processSET(enum states *state, unsigned char *check, unsigned char *byte){
     }
 }
 
-void processUA(enum states *state, unsigned char *check, unsigned char *byte){
+void processUA(enum states *state, unsigned char *check, unsigned char byte){
     switch (*state) {
         case START:
-            if (*byte == FLAG){
+            if (byte == FLAG){
                 *state = FLAG_RCV;
-                printf("F:\t%#4.2x\n", *byte);
+                printf("F:\t%#4.2x\n", byte);
             }
             break;
         case FLAG_RCV:
-            if (*byte == A_RE) {
+            if (byte == A_RE) {
                 *state = A_RCV;
-                check[0] = *byte;
-                printf("A:\t%#4.2x\n", *byte);
+                check[0] = byte;
+                printf("A:\t%#4.2x\n", byte);
             }
-            else if (*byte!= FLAG){
+            else if (byte!= FLAG){
                 *state = START;
             }
             break;
         case A_RCV:
-            if (*byte == C_UA) {
+            if (byte == C_UA) {
                 *state = C_RCV;
-                check[1] = *byte;
-                printf("C:\t%#4.2x\n", *byte);
+                check[1] = byte;
+                printf("C:\t%#4.2x\n", byte);
             }
-            else if (*byte == FLAG){
+            else if (byte == FLAG){
                 *state = FLAG_RCV;
             }
             else{
@@ -99,11 +99,11 @@ void processUA(enum states *state, unsigned char *check, unsigned char *byte){
             }
             break;
         case C_RCV:
-            if (*byte == BCC(check[0],check[1])){
+            if (byte == BCC(check[0],check[1])){
                 *state = BCC_OK;
-                printf("BCC1:\t%#4.2x\n", *byte);
+                printf("BCC1:\t%#4.2x\n", byte);
             }
-            else if (*byte == FLAG){
+            else if (byte == FLAG){
                 *state = FLAG_RCV;
             }
             else{
@@ -112,9 +112,9 @@ void processUA(enum states *state, unsigned char *check, unsigned char *byte){
             // precisa de valores de A & C
             break;
         case BCC_OK:
-            if (*byte == FLAG){
+            if (byte == FLAG){
                 *state = STOP;
-                printf("F:\t%#4.2x\n", *byte);
+                printf("F:\t%#4.2x\n", byte);
             }
             else{
                 *state = START;

@@ -76,12 +76,12 @@ int main(int argc, char** argv)
 	
 	while (state != STOP) {       /* loop for input */
 		if (read(fd,&byte,1) == -1)   /* returns after 1 char has been input */
-			printf("Error reading SET byte");
-		processSET(&state, check, &byte);
+			printf("Error reading SET byte\n");
+		processSET(&state, check, byte);
 	}
 	
 	if ((res=sendUA(fd)) == -1)
-		printf("Error sending UA");
+		printf("Error sending UA\n");
 	else
 		printf("%d UA bytes written\n", res);
 
