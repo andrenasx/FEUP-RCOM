@@ -1,3 +1,4 @@
+#pragma once
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -26,6 +27,7 @@ typedef struct
 {
     char port[20]; // /dev/ttySx
     int baudRate;  //transmission speed
+    int flag; //TRANSMITTER/RECEIVER
     unsigned int sequenceNumber; //trama sequence
     unsigned int timeout;
     unsigned int numTransmissions; //atempt number in case of failure
@@ -35,6 +37,8 @@ typedef struct
 } linkLayer;
 
 extern linkLayer linklayer;
+
+void setDataLinkLayer(char *port, int flag);
 
 //ll functions
 int llopen(char* port, int flag);

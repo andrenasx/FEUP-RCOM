@@ -2,13 +2,22 @@
 
 linkLayer linklayer;
 
+void setDataLinkLayer(char *port, int flag){
+    strcpy(linklayer.port, port);
+    linklayer.flag = flag;
+    linklayer.baudRate = BAUDRATE;
+    linklayer.numTransmissions = 0;
+    linklayer.alarm = 0;
+    linklayer.timeout = 1;
+}
+
 int llopen(char* port, int flag){
     int fd, res;
-    strcpy(linklayer.port, port);
-
+    
+    setDataLinkLayer(port, flag);
     fd = openSerial();
     
-    if(flag == RECEIVER){ //RECEIVER
+    if(linklayer.flag == RECEIVER){ //RECEIVER
         unsigned char check[2];
 	    unsigned char byte;
 	    enum states state = START;
@@ -28,7 +37,7 @@ int llopen(char* port, int flag){
             printf("%d UA bytes written\n", res);
     }
 
-    else if(flag == TRANSMITTER){
+    else if(linklayer.flag == TRANSMITTER){
         unsigned char byte;
         
         do {
@@ -53,6 +62,53 @@ int llopen(char* port, int flag){
     }
 
     return fd; 
+}
+
+int llclose(int fd){
+    int res;
+    if(linklayer.flag == RECEIVER){
+        unsigned char check[2];
+	    unsigned char byte;
+	    enum states state = START;
+
+        //read DISC frame
+	    while (state != STOP) {       /* loop for input */
+		if (read(fd,&byte,1) == -1)   /* returns after 1 char has been input */
+			printf("Error reading SET byte\n");
+		else
+			processFrameSU(&state, byte);
+	    }
+        
+        //send DISC frame
+        if((res=sendDISC(fd)) == -1)
+            printf("Error sending UA\n");
+        else
+            printf("%d UA bytes written\n", res);
+
+        //read UA frame
+        while (state != STOP) {       /* loop for input */
+		if (read(fd,&byte,1) == -1)   /* returns after 1 char has been input */
+			printf("Error reading SET byte\n");
+		else
+			processFrameSU(&state, byte);
+	    }
+
+	        printf("Recived SET\n");
+	
+	    if ((res=sendUA(fd)) == -1)
+		    printf("Error sending UA\n");
+	    else
+		    printf("%d UA bytes written\n", res);
+
+    }
+
+    else if(linklayer.flag == TRANSMITTER){
+        //send DISC fram
+        //read DISC frame
+        //send UA frame
+    }
+
+    return fd;
 }
 
 int openSerial(){
