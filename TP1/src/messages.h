@@ -8,10 +8,9 @@
 #include <unistd.h>
 #include "macros.h"
 
-#define ATTEMPT_NUM 3
-
 enum states {START, FLAG_RCV, A_RCV, C_RCV, BCC_OK, STOP};
 
 int sendSET(int fd);
 int sendUA(int fd);
+int sendDISC(int fd);
 void processFrameSU(enum states *state,  unsigned char byte);

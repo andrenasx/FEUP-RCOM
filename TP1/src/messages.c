@@ -10,6 +10,11 @@ int sendUA(int fd){
     return write(fd, ua, UA_SIZE);
 }
 
+int sendDISC(int fd){
+    unsigned char disc[5] = {FLAG, A_ER, C_DISC, BCC(A_ER, C_DISC), FLAG};
+    return write(fd, disc, 5);
+}
+
 void processFrameSU(enum states *state, unsigned char byte){
     static unsigned char c = 0;
     switch (*state) {
