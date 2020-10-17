@@ -70,15 +70,17 @@ int main(int argc, char** argv)
 
 	printf("New termios structure set\n");
 
-	unsigned char check[2];
 	unsigned char byte;
 	enum states state = START;
 	
 	while (state != STOP) {       /* loop for input */
 		if (read(fd,&byte,1) == -1)   /* returns after 1 char has been input */
 			printf("Error reading SET byte\n");
-		processSET(&state, check, byte);
+		else
+			processFrameSU(&state, byte);
 	}
+
+	printf("Recived SET\n");
 	
 	if ((res=sendUA(fd)) == -1)
 		printf("Error sending UA\n");

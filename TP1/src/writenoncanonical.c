@@ -94,17 +94,16 @@ int main(int argc, char** argv)
 		alarme=0;
 
 		enum states state = START;
-		unsigned char check[2];
 		while(state!=STOP && !alarme) {
 			if (read(fd, &byte, 1) == -1)
 				printf("Error reading UA byte\n");
-			else{
-				//printf("Byte:\t%#4.2x\n", byte);
-				processUA(&state, check, byte);
-			}
+			else
+				processFrameSU(&state, byte);
 		}
 		if (alarme) printf("Timed out! Retrying\n");
 	} while(count<4 && alarme);
+
+	printf("Recived UA\n");
    
 
 	if (tcsetattr(fd,TCSANOW,&oldtio) == -1) {
