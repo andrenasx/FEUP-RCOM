@@ -1,22 +1,22 @@
 CC = gcc
 CFLAGS = -Wall
-DEPS = macros.h messages.h
-OBJ = messages.o
+OBJ = src/messages.o
+DEPS = src/macros.h src/messages.h
 TARGETS = cable writenoncanonical noncanonical
 
 all: cable writenoncanonical noncanonical
 
 %.o: %.c $(DEPS)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c $< -o $@
 
 cable:
-	$(CC) $(CFLAGS) -o $@ $@.c
+	$(CC) $(CFLAGS) -o $@ src/$@.c
 
 writenoncanonical: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $@.c $(OBJ) -lm
+	$(CC) $(CFLAGS) $(OBJ) -o $@ src/$@.c -lm
 
 noncanonical: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $@.c $(OBJ) -lm
+	$(CC) $(CFLAGS) $(OBJ) -o $@ src/$@.c -lm
 
 clean:
 	@rm $(TARGETS) $(OBJ)

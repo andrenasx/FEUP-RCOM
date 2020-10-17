@@ -6,8 +6,8 @@ int sendSET(int fd) {
 }
 
 int sendUA(int fd){
-    unsigned char set[5] = {FLAG, A_RE, C_UA, BCC(A_RE, C_UA), FLAG};
-    return write(fd, set, UA_SIZE);
+    unsigned char ua[5] = {FLAG, A_RE, C_UA, BCC(A_RE, C_UA), FLAG};
+    return write(fd, ua, UA_SIZE);
 }
 
 void processSET(enum states *state, unsigned char *check, unsigned char byte){
