@@ -79,3 +79,35 @@ void processFrameSU(enum states *state, unsigned char byte){
             break;
     }
 }
+
+int readCommand(int fd){
+    unsigned char byte;
+    enum states state = START;
+	
+    while (state != STOP) {       /* loop for input */
+        if (read(fd,&byte,1) == -1){ /* returns after 1 char has been input */
+            printf("Error reading SET byte\n");
+        }
+        else{
+            processFrameSU(&state, byte);
+        }
+    }
+
+    return 0;
+}
+
+int readResponse(int fd){
+    unsigned char byte;
+    enum states state = START;
+
+    while(state!=STOP && !linklayer.alarm) {
+        if (read(fd, &byte, 1) == -1){
+            printf("Error reading UA byte\n");
+        }
+        else{
+            processFrameSU(&state, byte);
+        }
+    }
+
+    return 0;
+}

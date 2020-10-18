@@ -13,54 +13,52 @@ void setDataLinkLayer(char *port, int flag){
 }
 
 int llopen(char* port, int flag){
-    int fd, res;
+    int fd;
     
     setDataLinkLayer(port, flag);
     fd = openSerial();
-    
-    if(linklayer.flag == RECEIVER){ //RECEIVER
-	    unsigned char byte;
-	    enum states state = START;
-	
-	    while (state != STOP) {       /* loop for input */
-            if (read(fd,&byte,1) == -1)   /* returns after 1 char has been input */
-                printf("Error reading SET byte\n");
-            else
-                processFrameSU(&state, byte);
-	    }
 
-	    printf("Recived SET\n");
-	
-        if ((res=sendUA(fd)) == -1)
-            printf("Error sending UA\n");
-        else
-            printf("%d UA bytes written\n", res);
-    }
-
-    else if(linklayer.flag == TRANSMITTER){
-        unsigned char byte;
-        
+    if(linklayer.flag == TRANSMITTER){
         do {
-            if ((res=sendSET(fd)) == -1)
-            printf("Error sending SET\n");
-            else
-                printf("%d SET bytes written\n", res);
+            if (sendSET(fd) == -1){
+                printf("Error sending SET\n");
+            }
+            else {
+                printf("Sent SET\n");
+            }
 
             setAlarm();
-            linklayer.alarm=0;
 
-            enum states state = START;
-            while(state!=STOP && !linklayer.alarm) {
-                if (read(fd, &byte, 1) == -1)
-                    printf("Error reading UA byte\n");
-                else
-                    processFrameSU(&state, byte);
+            if(readResponse(fd) == -1){
+                printf("Error receiving UA\n");
             }
-            if (linklayer.alarm) printf("Timed out! Retrying\n");
+            else {
+                printf("Received UA\n");
+            }
+
         } while (linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
 
         unsetAlarm();
+    }
+    
+    else if(linklayer.flag == RECEIVER){
+	    if (readCommand(fd) == -1 ){
+            printf("Error receiving SET\n");
+            return -1;
+        }
+        else {
+            printf("Received SET\n");
+        }
+        
+	
+        if (sendUA(fd) == -1){
+            printf("Error sending UA\n");
+        }
+        else {
+            printf("Sent UA\n");
+        }
+
     }
 
     return fd; 
