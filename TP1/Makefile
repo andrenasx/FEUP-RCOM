@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall
-OBJ = src/messages.o
-DEPS = src/macros.h src/messages.h
+OBJ = src/messages.o src/ll.o src/alarm.o
+DEPS = src/macros.h src/messages.h src/ll.h src/alarm.h
 TARGETS = cable writenoncanonical noncanonical
 
 all: cable writenoncanonical noncanonical

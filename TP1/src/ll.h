@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #include "messages.h"
+#include "alarm.h"
 
 #define BAUDRATE B38400
 #define MODEMDEVICE "/dev/ttyS1"
@@ -33,7 +34,6 @@ typedef struct
     unsigned int numTransmissions; //atempt number in case of failure
     unsigned int alarm;
     char frame[256]; //trama
-    struct termios oldtio, newtio;
 } linkLayer;
 
 extern linkLayer linklayer;
