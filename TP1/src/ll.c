@@ -65,48 +65,69 @@ int llopen(char* port, int flag){
 }
 
 int llclose(int fd){
-    // int res;
-    // if(linklayer.flag == RECEIVER){
-    //     unsigned char check[2];
-	//     unsigned char byte;
-	//     enum states state = START;
+    if(linklayer.flag == RECEIVER){
+		//read DISC frame
+       if(readCommand(fd) == -1){
+           printf("Error reading DISC frame\n");
+           return -1;
+       }
+       else
+       {
+           printf("Received DISC\n");
+       }      
+       //send DISC frame
+       if (sendDISC(fd) == -1){
+            printf("Error sending DISC\n");
+        }
+        else {
+            printf("Sent DISC\n");
+        }
+        //read UA
+        if(readCommand(fd) == -1){
+            printf("Error reading UA\n");
+            return -1;
+        }
+		else
+		{
+			printf("Sent UA\n");
+		}
+		       
+    }
 
-    //     //read DISC frame
-	//     while (state != STOP) {       /* loop for input */
-	// 	if (read(fd,&byte,1) == -1)   /* returns after 1 char has been input */
-	// 		printf("Error reading SET byte\n");
-	// 	else
-	// 		processFrameSU(&state, byte);
-	//     }
-        
-    //     //send DISC frame
-    //     if((res=sendDISC(fd)) == -1)
-    //         printf("Error sending UA\n");
-    //     else
-    //         printf("%d UA bytes written\n", res);
+    else if(linklayer.flag == TRANSMITTER){
+        do{
+			//send DISC
+			if (sendDISC(fd) == -1){
+            printf("Error sending DISC\n");
+        	}	
+        	else {
+            printf("Sent DISC\n");
+        	}
+			setAlarm();
+			//read DISC
+			if(readResponse(fd) == -1){
+           		printf("Error reading DISC frame\n");
+           		return -1;
+       		}
+       		else{
+           		printf("Received DISC\n");
+       		} 
+		}while (linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
-    //     //read UA frame
-    //     while (state != STOP) {       /* loop for input */
-	// 	if (read(fd,&byte,1) == -1)   /* returns after 1 char has been input */
-	// 		printf("Error reading SET byte\n");
-	// 	else
-	// 		processFrameSU(&state, byte);
-	//     }
+		unsetAlarm();
 
-	//         printf("Recived SET\n");
-	
-	//     if ((res=sendUA(fd)) == -1)
-	// 	    printf("Error sending UA\n");
-	//     else
-	// 	    printf("%d UA bytes written\n", res);
+		if(linklayer.numTransmissions >= MAX_TRANSMISSIONS)
+			printf("Error max retries\n");
+		else{
+			if (sendUA(fd) == -1){
+            printf("Error sending UA\n");
+        	}
+        	else {
+            printf("Sent UA\n");
+        	}
+		}
 
-    // }
-
-    // else if(linklayer.flag == TRANSMITTER){
-    //     //send DISC fram
-    //     //read DISC frame
-    //     //send UA frame
-    // }
+    }
 
     if (tcsetattr(fd,TCSANOW,&oldtio) == -1) {
 		perror("tcsetattr");
