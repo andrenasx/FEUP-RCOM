@@ -95,7 +95,7 @@ fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
 
 unsigned char tx2rx[512];
 unsigned char rx2tx[512];
-unsigned char rxStdin[512];
+char rxStdin[512];
 
 int fromTx, toRx;
 int fromRx, toTx;

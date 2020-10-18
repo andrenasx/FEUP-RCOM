@@ -26,8 +26,6 @@ void atende(){
 
 int main(int argc, char** argv)
 {
-	int fd, res;
-	
 	if ( (argc < 2) || 
   		 ((strcmp("/dev/ttyS10", argv[1])!=0) && 
   		  (strcmp("/dev/ttyS11", argv[1])!=0) )) {
@@ -35,7 +33,7 @@ int main(int argc, char** argv)
 	  exit(1);
 	}
 
-	fd = llopen(argv[1], TRANSMITTER);
+	int fd = llopen(argv[1], TRANSMITTER);
 	llclose(fd);
 
 	return 0;

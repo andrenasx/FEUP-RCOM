@@ -109,5 +109,7 @@ int readResponse(int fd){
         }
     }
 
+    if(linklayer.alarm) return -1;
+
     return 0;
 }

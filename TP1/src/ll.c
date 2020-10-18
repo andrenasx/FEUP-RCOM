@@ -89,7 +89,7 @@ int llclose(int fd){
         }
 		else
 		{
-			printf("Sent UA\n");
+			printf("Received UA\n");
 		}
 		       
     }
@@ -98,16 +98,17 @@ int llclose(int fd){
         do{
 			//send DISC
 			if (sendDISC(fd) == -1){
-            printf("Error sending DISC\n");
+                printf("Error sending DISC\n");
         	}	
         	else {
-            printf("Sent DISC\n");
+                printf("Sent DISC\n");
         	}
+
 			setAlarm();
+
 			//read DISC
 			if(readResponse(fd) == -1){
            		printf("Error reading DISC frame\n");
-           		return -1;
        		}
        		else{
            		printf("Received DISC\n");
@@ -116,17 +117,12 @@ int llclose(int fd){
 
 		unsetAlarm();
 
-		if(linklayer.numTransmissions >= MAX_TRANSMISSIONS)
-			printf("Error max retries\n");
-		else{
-			if (sendUA(fd) == -1){
+        if (sendUA(fd) == -1){
             printf("Error sending UA\n");
-        	}
-        	else {
+        }
+        else {
             printf("Sent UA\n");
-        	}
-		}
-
+        }
     }
 
     if (tcsetattr(fd,TCSANOW,&oldtio) == -1) {
