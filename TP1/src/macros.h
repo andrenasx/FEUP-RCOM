@@ -1,8 +1,10 @@
-// Tramas de Supervisao (S) e Não Numeradas (U)
+// Frame Macros
 #define SET_SIZE 5  // tamanho em bytes da trama SET
 #define UA_SIZE 5  // tamanho em bytes da trama UA
 
 #define FLAG 0x7e  // Flag de inicio e fim
+#define ESCAPE 0x7d // Octeto de escape
+#define STUFFING 0x20 // Octeto para stuffing
 
 #define A_ER 0x03  // Campo de Endereço (A) de commandos do Emissor, resposta do Receptor
 #define A_RE 0x01  // Campo de Endereço (A) de commandos do Receptor, resposta do Emissor
