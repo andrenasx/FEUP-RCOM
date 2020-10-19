@@ -16,6 +16,8 @@
 #define C_RR1 0x85
 #define C_REJ0 0x01 // Campo de Controlo - REJ (reject / negative ACK))
 #define C_REJ1 0x81
+#define C_I0 0x00 // Campo de Controlo - I
+#define C_I1 0x40
 
 #define BCC(a,c) (a ^ c)
 

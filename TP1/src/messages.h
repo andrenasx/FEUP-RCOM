@@ -18,3 +18,5 @@ int sendDISC(int fd);
 void processFrameSU(enum states *state,  unsigned char byte);
 int readCommand(int fd);
 int readResponse(int fd);
+
+int writeStuffedFrame(int fd, unsigned char *buffer, int length);

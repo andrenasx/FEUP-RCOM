@@ -113,3 +113,50 @@ int readResponse(int fd){
 
     return 0;
 }
+
+int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
+    unsigned char frame[2 * length + 6];
+
+    // Frame Header
+    frame[0] = FLAG;
+    frame[1] = A_ER;
+    frame[2] = (linklayer.sequenceNumber==0 ? C_I0 : C_I1);
+    frame[3] = BCC(A_ER, frame[2]);
+
+    // BCC2 before byte stuffing
+    unsigned char bcc2 = buffer[0];
+    for(int i=1; i<length; i++){
+        bcc2 ^= buffer[i];
+    }
+
+    // Process data
+    int dataIndex=0, frameIndex=4;
+    unsigned char bufferAux;
+
+    while(dataIndex < length) {
+        bufferAux = buffer[dataIndex++];
+
+        // Byte Stuffing
+        if(bufferAux == FLAG || bufferAux == ESCAPE) {
+            frame[frameIndex++] = ESCAPE;
+            frame[frameIndex++] = bufferAux ^ STUFFING;
+        }
+        else {
+            frame[frameIndex++] = bufferAux;
+        }
+    }
+
+    // Frame Footer
+    if(bcc2 == FLAG || bcc2 == ESCAPE) {
+        frame[frameIndex++] = ESCAPE;
+            frame[frameIndex++] = bcc2 ^ STUFFING;
+    }
+    else {
+        frame[frameIndex++] = bcc2;
+    }
+
+    frame[frameIndex++] = FLAG;
+    write(fd, frame, frameIndex);
+
+    return frameIndex;
+}
