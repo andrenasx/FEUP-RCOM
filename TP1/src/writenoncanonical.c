@@ -26,14 +26,18 @@ void atende(){
 
 int main(int argc, char** argv)
 {
-	if ( (argc < 2) || 
-  		 ((strcmp("/dev/ttyS10", argv[1])!=0) && 
-  		  (strcmp("/dev/ttyS11", argv[1])!=0) )) {
+	if ((argc < 2)) {
 	  printf("Usage:\tnserial SerialPort\n\tex: nserial /dev/ttyS1\n");
 	  exit(1);
 	}
 
-	int fd = llopen(argv[1], TRANSMITTER);
+	int port = atoi(argv[1]);
+	if (port!=0 && port!=1 && port!=10 && port!=11){
+		printf("Port number must be one of {0 / 1 / 10 / 11}");
+		exit(1);
+	}
+
+	int fd = llopen(port, TRANSMITTER);
 	llclose(fd);
 
 	return 0;

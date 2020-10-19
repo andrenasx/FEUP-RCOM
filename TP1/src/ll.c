@@ -3,8 +3,10 @@
 struct termios oldtio, newtio;
 linkLayer linklayer;
 
-void setDataLinkLayer(char *port, int flag){
-    strcpy(linklayer.port, port);
+void setDataLinkLayer(int port, int flag){
+    char porta[12];
+    snprintf(porta, 12, "/dev/ttyS%d", port);
+    strcpy(linklayer.port, porta);
     linklayer.flag = flag;
     linklayer.baudRate = BAUDRATE;
     linklayer.numTransmissions = 0;
@@ -12,7 +14,7 @@ void setDataLinkLayer(char *port, int flag){
     linklayer.timeout = 1;
 }
 
-int llopen(char* port, int flag){
+int llopen(int port, int flag){
     int fd;
     
     setDataLinkLayer(port, flag);

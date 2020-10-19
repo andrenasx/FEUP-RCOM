@@ -38,10 +38,10 @@ typedef struct
 
 extern linkLayer linklayer;
 
-void setDataLinkLayer(char *port, int flag);
+void setDataLinkLayer(int port, int flag);
 
 //ll functions
-int llopen(char* port, int flag);
+int llopen(int port, int flag);
 int llclose(int fd);
 
 
