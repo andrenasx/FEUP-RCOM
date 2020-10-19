@@ -162,30 +162,31 @@ int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
 }
 
 int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_frame){
-    //Frame Header
-    destuffed_frame[0] = frame[0]; //flag
-    destuffed_frame[1] = frame[1]; //A
-    destuffed_frame[2] = frame[2]; //C
-    destuffed_frame[3] = frame[3]; //BCC1
+    // Frame Header
+    destuffed_frame[0] = frame[0]; // FLAG
+    destuffed_frame[1] = frame[1]; // A
+    destuffed_frame[2] = frame[2]; // C
+    destuffed_frame[3] = frame[3]; // BCC1
 
-    //Process data
-    int i=4, j=4;
-    for(i; i < length-1; i++){
-        if(frame[i] == ESCAPE){
-            i++;
-            if(frame[i == (FLAG ^ STUFFING)])
-                destuffed_frame[j] = FLAG;
-            else if(frame[i] == (ESCAPE ^ STUFFING))
-                destuffed_frame[j] = ESCAPE;
+    // Process data
+    int dframeIndex=4, frameIndex;
+
+    for(frameIndex=4; frameIndex < length-1; frameIndex++){
+        if(frame[frameIndex] == ESCAPE){
+            frameIndex++;
+            if(frame[frameIndex] == (FLAG ^ STUFFING))
+                destuffed_frame[dframeIndex] = FLAG;
+            else if(frame[frameIndex] == (ESCAPE ^ STUFFING))
+                destuffed_frame[dframeIndex] = ESCAPE;
         }
         else{
-            destuffed_frame[j] = frame[i];
+            destuffed_frame[dframeIndex] = frame[frameIndex];
         }
-        j++;
+        dframeIndex++;
     }
 
-    //Frame Footer
-    destuffed_frame[j++] = frame[i++]; //Flag
+    // Frame Footer
+    destuffed_frame[dframeIndex++] = frame[frameIndex++]; // FLAG
 
-    return j;
+    return dframeIndex;
 }
