@@ -160,3 +160,32 @@ int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
 
     return frameIndex;
 }
+
+int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_frame){
+    //Frame Header
+    destuffed_frame[0] = frame[0]; //flag
+    destuffed_frame[1] = frame[1]; //A
+    destuffed_frame[2] = frame[2]; //C
+    destuffed_frame[3] = frame[3]; //BCC1
+
+    //Process data
+    int i=4, j=4;
+    for(i; i < length-1; i++){
+        if(frame[i] == ESCAPE){
+            i++;
+            if(frame[i == (FLAG ^ STUFFING)])
+                destuffed_frame[j] = FLAG;
+            else if(frame[i] == (ESCAPE ^ STUFFING))
+                destuffed_frame[j] = ESCAPE;
+        }
+        else{
+            destuffed_frame[j] = frame[i];
+        }
+        j++;
+    }
+
+    //Frame Footer
+    destuffed_frame[j++] = frame[i++]; //Flag
+
+    return j;
+}

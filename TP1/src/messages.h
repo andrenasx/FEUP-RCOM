@@ -20,3 +20,4 @@ int readCommand(int fd);
 int readResponse(int fd);
 
 int writeStuffedFrame(int fd, unsigned char *buffer, int length);
+int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_frame);
