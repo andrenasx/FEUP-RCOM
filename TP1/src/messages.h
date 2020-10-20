@@ -20,12 +20,13 @@ int sendRR1(int fd);
 int sendREJ0(int fd);
 int sendREJ1(int fd);
 
-void processFrameSU(enum states *state,  unsigned char byte);
+unsigned char processFrameSU(enum states *state,  unsigned char byte);
 void processFrameI(enum states *state,  unsigned char byte);
 
 int readCommand(int fd);
 int readResponse(int fd);
 int readFrameI(int fd, unsigned char *frame);
+int readAck(int fd);
 
 int writeStuffedFrame(int fd, unsigned char *buffer, int length);
 int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_frame);
