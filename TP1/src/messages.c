@@ -149,17 +149,21 @@ void processFrameI(enum states *state, unsigned char byte){
             break;
 
         case BCC_OK:
-            if (byte == FLAG){
+            if (byte != FLAG){
                 *state = DATA;
-                printf("F:\t%#4.2x\n", byte);
+                printf("D:\t%#4.2x\n", byte);
             }
             else{
                 *state = START;
             }
             break;
         case DATA:
-            if (byte != FLAG){
+            if (byte == FLAG){
+                printf("F:\t%#4.2x\n", byte);
                 *state = STOP;
+            }
+            else {
+                printf("D:\t%#4.2x\n", byte);
             }
         case STOP:
             break;
@@ -238,22 +242,22 @@ int readAck(int fd){
     }
 
     if(linklayer.sequenceNumber == 0 && control_field == C_RR1){
-        printf("RR received: %d", linklayer.sequenceNumber);
+        printf("RR received: %d\n", linklayer.sequenceNumber);
         return 0;
     }
 
     else if(linklayer.sequenceNumber == 1 && control_field == C_RR0){
-        printf("RR received: %d", linklayer.sequenceNumber);
+        printf("RR received: %d\n", linklayer.sequenceNumber);
         return 0;
     }
 
     else if(linklayer.sequenceNumber == 0 && control_field == C_REJ1){
-        printf("REJ received: %d", linklayer.sequenceNumber);
+        printf("REJ received: %d\n", linklayer.sequenceNumber);
         return -1;
     }
 
     else if(linklayer.sequenceNumber == 1 && control_field == C_REJ0){
-        printf("REJ received: %d", linklayer.sequenceNumber);
+        printf("REJ received: %d\n", linklayer.sequenceNumber);
         return -1;
     }
 
