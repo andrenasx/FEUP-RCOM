@@ -43,6 +43,6 @@ void setDataLinkLayer(int port, int flag);
 //ll functions
 int llopen(int port, int flag);
 int llclose(int fd);
-
+int llwrite(int fd, char* buffer, int length);
 
 int openSerial();

@@ -12,6 +12,7 @@ void setDataLinkLayer(int port, int flag){
     linklayer.numTransmissions = 0;
     linklayer.alarm = 0;
     linklayer.timeout = 1;
+    linklayer.sequenceNumber = 0;
 }
 
 int llopen(int port, int flag){
@@ -135,6 +136,25 @@ int llclose(int fd){
 	close(fd);
 
     return 0;
+}
+
+int llwrite(int fd, char* buffer, int length){
+    do{
+        //send frame
+        writeStuffedFrame(fd, buffer, length);
+        setAlarm();
+        //read receiver response
+        if(readAck(fd) == -1){ //check REJ/RR
+            unsetAlarm();
+            continue;
+        }
+
+    }while(linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
+
+    unsetAlarm();
+    linklayer.numTransmissions = 0;
+    
+    return length;
 }
 
 int openSerial(){
