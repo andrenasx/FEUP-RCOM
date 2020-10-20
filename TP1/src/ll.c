@@ -148,6 +148,9 @@ int llwrite(int fd, char* buffer, int length){
             unsetAlarm();
             continue;
         }
+        else {
+            //printf("RR received\n");
+        }
 
     }while(linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
@@ -207,15 +210,19 @@ int llread(int fd, unsigned char *buffer) {
     unsigned char control_field;
 
     while(!received){
-        if(frame_length = readFrameI(fd, frame)){
-            dframe_length = destuffFrame(frame, frame_length, dframe);
+        if((frame_length = readFrameI(fd, frame))){
             control_field = frame[2];
 
+            // Destuff received frame
+            dframe_length = destuffFrame(frame, frame_length, dframe);
+
+            // Calculate BCC2 after destuffing
             unsigned char bcc2 = dframe[4];
-            for(int i=5; i<dframe_length-6; i++){
-                bcc2 ^= buffer[i];
+            for(int i=5; i<dframe_length-7+5; i++){
+                bcc2 ^= dframe[i];
             }
 
+            // Verify if calculted BCC2 matches with received BCC2
             if(bcc2!=dframe[dframe_length-2]){
                 printf("BCC2 Error\n");
                 
