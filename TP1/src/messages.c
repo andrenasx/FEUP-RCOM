@@ -15,6 +15,26 @@ int sendDISC(int fd){
     return write(fd, disc, 5);
 }
 
+int sendRR0(int fd){
+    unsigned char rr0[5] = {FLAG, A_ER, C_RR0, BCC(A_ER, C_RR0), FLAG};
+    return write(fd, rr0, 5);
+}
+
+int sendRR1(int fd){
+    unsigned char rr1[5] = {FLAG, A_ER, C_RR1, BCC(A_ER, C_RR1), FLAG};
+    return write(fd, rr1, 5);
+}
+
+int sendREJ0(int fd){
+    unsigned char rej0[5] = {FLAG, A_ER, C_REJ0, BCC(A_ER, C_REJ0), FLAG};
+    return write(fd, rej0, 5);
+}
+
+int sendREJ1(int fd){
+    unsigned char rej1[5] = {FLAG, A_ER, C_REJ1, BCC(A_ER, C_REJ1), FLAG};
+    return write(fd, rej1, 5);
+}
+
 void processFrameSU(enum states *state, unsigned char byte){
     static unsigned char c = 0;
     switch (*state) {
@@ -80,6 +100,74 @@ void processFrameSU(enum states *state, unsigned char byte){
     }
 }
 
+void processFrameI(enum states *state, unsigned char byte){
+    static unsigned char c = 0;
+    switch (*state) {
+        case START:
+            if (byte == FLAG) {
+                *state = FLAG_RCV;
+                printf("F:\t%#4.2x\n", byte);
+            }
+            break;
+
+        case FLAG_RCV:
+            if (byte == A_ER) {
+                *state = A_RCV;
+                printf("A:\t%#4.2x\n", byte);
+            }
+            else if (byte!= FLAG){
+                *state = START;
+            }
+            break;
+
+        case A_RCV:
+            if ((byte==C_I0 && linklayer.sequenceNumber==0) || (byte==C_I1 && linklayer.sequenceNumber==1)) {
+                *state = C_RCV;
+                c = byte;
+                printf("C:\t%#4.2x\n", byte);
+            }
+            else if (byte == FLAG){
+                *state = FLAG_RCV;
+            }
+            else{
+                *state = START;
+            }
+            break;
+
+        case C_RCV:
+            if (byte == BCC(A_ER,c)){
+                *state = BCC_OK;
+                printf("BCC1:\t%#4.2x\n", byte);
+            }
+            else if (byte == FLAG){
+                *state = FLAG_RCV;
+            }
+            else{
+                *state = START;
+            }
+            break;
+
+        case BCC_OK:
+            if (byte == FLAG){
+                *state = DATA;
+                printf("F:\t%#4.2x\n", byte);
+            }
+            else{
+                *state = START;
+            }
+            break;
+        case DATA:
+            if (byte != FLAG){
+                *state = STOP;
+            }
+        case STOP:
+            break;
+        
+        default:
+            break;
+    }
+}
+
 int readCommand(int fd){
     unsigned char byte;
     enum states state = START;
@@ -112,6 +200,27 @@ int readResponse(int fd){
     if(linklayer.alarm) return -1;
 
     return 0;
+}
+
+int readFrameI(int fd, unsigned char *frame){
+    unsigned char byte;
+    int length = 0;
+    enum states state = START;
+	
+    while (state != STOP) {       /* loop for input */
+        if (read(fd,&byte,1) == -1){ /* returns after 1 char has been input */
+            printf("Error reading I byte\n");
+        }
+        else{
+            processFrameI(&state, byte);
+
+            if(state == FLAG && length !=0) length = 0;
+
+            frame[length++] = byte;
+        }
+    }
+
+    return length;
 }
 
 int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
