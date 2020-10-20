@@ -32,6 +32,9 @@ int main(int argc, char** argv)
 
 
 	int fd = llopen(port, RECEIVER);
+	unsigned char frame[256];
+	int res = llread(fd, frame);
+	printf("\n%d buffer bytes recevied\n\n", res);
 	llclose(fd);
 
 	return 0;

@@ -38,6 +38,8 @@ int main(int argc, char** argv)
 	}
 
 	int fd = llopen(port, TRANSMITTER);
+	int res = llwrite(fd, "hel~o}", strlen("hel~o}"));
+	printf("\n%d buffer bytes sent\n\n", res);
 	llclose(fd);
 
 	return 0;
