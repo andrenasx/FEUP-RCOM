@@ -176,3 +176,71 @@ int openSerial(){
 	printf("New termios structure set\n");
     return fd;
 }
+
+int llread(int fd, unsigned char *buffer) {
+    int received = 0;
+    int frame_length = 0;
+    int dframe_length = 0;
+    int packet_length = 0;
+    unsigned char frame[256];
+    unsigned char dframe[256];
+    unsigned char control_field;
+
+    while(!received){
+        if(frame_length = readFrameI(fd, frame)){
+            dframe_length = destuffFrame(frame, frame_length, dframe);
+            control_field = frame[2];
+
+            unsigned char bcc2 = dframe[4];
+            for(int i=5; i<dframe_length-6; i++){
+                bcc2 ^= buffer[i];
+            }
+
+            if(bcc2!=dframe[dframe_length-2]){
+                printf("BCC2 Error\n");
+                
+                if(control_field == C_I0){
+                    sendREJ0(fd);
+                    printf("Sent REJ0\n");
+                }
+                else if(control_field == C_I1){
+                    sendREJ1(fd);
+                    printf("Sent REJ1\n");
+                }
+
+                return 0;
+            }
+
+            else {
+                for(int i=4; i< dframe_length - 2; i++){
+                    buffer[packet_length++] = dframe[i];
+                }
+
+                if(control_field == C_I0) {
+                    if(sendRR1(fd) == -1){
+                        printf("Error sending RR1\n");
+                    }
+                    else {
+                        printf("Sent RR1\n");
+                    }
+                }
+                else if(control_field == C_I1) {
+                    if(sendRR0(fd) == -1){
+                        printf("Error sending RR0\n");
+                    }
+                    else {
+                        printf("Sent RR1\n");
+                    }
+                }
+
+                received = 1;
+            }
+            
+        }
+        
+    }
+
+    linklayer.sequenceNumber^=0x01;
+
+    return packet_length;
+}
