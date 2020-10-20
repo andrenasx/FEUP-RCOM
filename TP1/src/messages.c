@@ -15,7 +15,7 @@ int sendDISC(int fd){
     return write(fd, disc, 5);
 }
 
-void processFrameSU(enum states *state, unsigned char byte){
+unsigned char processFrameSU(enum states *state, unsigned char byte){
     static unsigned char c = 0;
     switch (*state) {
         case START:
@@ -78,6 +78,7 @@ void processFrameSU(enum states *state, unsigned char byte){
         default:
             break;
     }
+    return c;
 }
 
 int readCommand(int fd){
@@ -112,6 +113,42 @@ int readResponse(int fd){
     if(linklayer.alarm) return -1;
 
     return 0;
+}
+
+int readAck(int fd){
+    unsigned char byte;
+    enum states state = START;
+    unsigned char control_field;
+
+    while(state!=STOP && !linklayer.alarm) {
+        if (read(fd, &byte, 1) == -1){
+        }
+        else{
+            control_field = processFrameSU(&state, byte);
+        }
+    }
+
+    if(linklayer.sequenceNumber == 0 && control_field == C_RR1){
+        printf("RR received: %d", linklayer.sequenceNumber);
+        return 0;
+    }
+
+    else if(linklayer.sequenceNumber == 1 && control_field == C_RR0){
+        printf("RR received: %d", linklayer.sequenceNumber);
+        return 0;
+    }
+
+    else if(linklayer.sequenceNumber == 0 && control_field == C_REJ1){
+        printf("REJ received: %d", linklayer.sequenceNumber);
+        return -1;
+    }
+
+    else if(linklayer.sequenceNumber == 1 && control_field == C_REJ0){
+        printf("REJ received: %d", linklayer.sequenceNumber);
+        return -1;
+    }
+
+    return -1;
 }
 
 int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
