@@ -18,14 +18,7 @@
 #define RECEIVER 1
 #define MAX_TRANSMISSIONS 3
 
-typedef struct 
-{
-    int fileDescriptor;
-    int status; //TRANSMITTER/RECEIVER
-} applicationLayer;
-
-typedef struct 
-{
+typedef struct {
     char port[20]; // /dev/ttySx
     int baudRate;  //transmission speed
     int flag; //TRANSMITTER/RECEIVER
