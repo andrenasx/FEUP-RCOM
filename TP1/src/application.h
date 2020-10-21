@@ -32,3 +32,4 @@ typedef struct {
 } applicationLayer;
 
 int sendControlPacket(unsigned char control_field);
+int readControlPacket(unsigned char control_field);
