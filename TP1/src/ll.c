@@ -140,10 +140,10 @@ int llclose(int fd){
 
 int llwrite(int fd, char* buffer, int length){
     do{
-        //send frame
+        // Send frame
         writeStuffedFrame(fd, buffer, length);
         setAlarm();
-        //read receiver response
+        // Read receiver ACK
         if(readAck(fd) == -1){ //check REJ/RR
             unsetAlarm();
             continue;
@@ -155,7 +155,6 @@ int llwrite(int fd, char* buffer, int length){
     }while(linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
     unsetAlarm();
-    linklayer.numTransmissions = 0;
     
     return length;
 }
@@ -207,11 +206,11 @@ int llread(int fd, unsigned char *buffer) {
     int packet_length = 0;
     unsigned char frame[256];
     unsigned char dframe[256];
-    unsigned char control_field;
+    unsigned char control;
 
     while(!received){
         if((frame_length = readFrameI(fd, frame))){
-            control_field = frame[2];
+            control = frame[2];
 
             // Destuff received frame
             dframe_length = destuffFrame(frame, frame_length, dframe);
@@ -226,11 +225,12 @@ int llread(int fd, unsigned char *buffer) {
             if(bcc2!=dframe[dframe_length-2]){
                 printf("BCC2 Error\n");
                 
-                if(control_field == C_I0){
+                // If not, send REJ
+                if(control == C_I0){
                     sendREJ0(fd);
                     printf("Sent REJ0\n");
                 }
-                else if(control_field == C_I1){
+                else if(control == C_I1){
                     sendREJ1(fd);
                     printf("Sent REJ1\n");
                 }
@@ -239,11 +239,13 @@ int llread(int fd, unsigned char *buffer) {
             }
 
             else {
+                // Fills arg buffer with Data from destuffed frame
                 for(int i=4; i< dframe_length - 2; i++){
                     buffer[packet_length++] = dframe[i];
                 }
 
-                if(control_field == C_I0) {
+                // Send correct RR
+                if(control == C_I0) {
                     if(sendRR1(fd) == -1){
                         printf("Error sending RR1\n");
                     }
@@ -251,7 +253,7 @@ int llread(int fd, unsigned char *buffer) {
                         printf("Sent RR1\n");
                     }
                 }
-                else if(control_field == C_I1) {
+                else if(control == C_I1) {
                     if(sendRR0(fd) == -1){
                         printf("Error sending RR0\n");
                     }
@@ -267,6 +269,7 @@ int llread(int fd, unsigned char *buffer) {
         
     }
 
+    // Change sequence number (0 / 1)
     linklayer.sequenceNumber^=0x01;
 
     return packet_length;

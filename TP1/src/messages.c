@@ -235,6 +235,7 @@ int readAck(int fd){
 
     while(state!=STOP && !linklayer.alarm) {
         if (read(fd, &byte, 1) == -1){
+            printf("Error reading ACK byte\n");
         }
         else{
             control_field = processFrameSU(&state, byte);
@@ -242,25 +243,26 @@ int readAck(int fd){
     }
 
     if(linklayer.sequenceNumber == 0 && control_field == C_RR1){
-        printf("RR received: %d\n", linklayer.sequenceNumber);
+        printf("Received RR1\n");
         return 0;
     }
 
     else if(linklayer.sequenceNumber == 1 && control_field == C_RR0){
-        printf("RR received: %d\n", linklayer.sequenceNumber);
+        printf("Received RR0\n");
         return 0;
     }
 
     else if(linklayer.sequenceNumber == 0 && control_field == C_REJ1){
-        printf("REJ received: %d\n", linklayer.sequenceNumber);
+        printf("Received REJ1\n");
         return -1;
     }
 
     else if(linklayer.sequenceNumber == 1 && control_field == C_REJ0){
-        printf("REJ received: %d\n", linklayer.sequenceNumber);
+        printf("Received REJ1\n");
         return -1;
     }
 
+    printf("Received Ack error\n");
     return -1;
 }
 
@@ -299,7 +301,7 @@ int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
     // Frame Footer
     if(bcc2 == FLAG || bcc2 == ESCAPE) {
         frame[frameIndex++] = ESCAPE;
-            frame[frameIndex++] = bcc2 ^ STUFFING;
+        frame[frameIndex++] = bcc2 ^ STUFFING;
     }
     else {
         frame[frameIndex++] = bcc2;
