@@ -43,6 +43,11 @@ int llopen(int port, int flag){
 
 
         unsetAlarm();
+        if(linklayer.numTransmissions >= MAX_TRANSMISSIONS){
+            printf("Reached max retries\n");
+            return -1;
+        }
+        linklayer.numTransmissions=0;
     }
     
     else if(linklayer.flag == RECEIVER){
@@ -119,6 +124,11 @@ int llclose(int fd){
 		}while (linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
 		unsetAlarm();
+        if(linklayer.numTransmissions >= MAX_TRANSMISSIONS){
+            printf("Reached max retries\n");
+            return -1;
+        }
+        linklayer.numTransmissions=0;
 
         if (sendUA(fd) == -1){
             printf("Error sending UA\n");
@@ -155,6 +165,11 @@ int llwrite(int fd, char* buffer, int length){
     }while(linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
     unsetAlarm();
+    if(linklayer.numTransmissions >= MAX_TRANSMISSIONS){
+            printf("Reached max retries\n");
+            return -1;
+        }
+        linklayer.numTransmissions=0;
     
     return length;
 }

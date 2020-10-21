@@ -34,7 +34,6 @@ void unsetAlarm() {
     sigaction(SIGALRM, &sa, NULL);
 
     linklayer.alarm = 0;
-    linklayer.numTransmissions = 0;
 
     alarm(0); // uninstall alarm
 }

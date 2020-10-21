@@ -38,9 +38,16 @@ int main(int argc, char** argv)
 	}
 
 	int fd = llopen(port, TRANSMITTER);
+	if(fd == -1){
+		printf("llopen error\n");
+		return -1;
+	}
 	int res = llwrite(fd, "hel~o}", strlen("hel~o}"));
 	printf("\n%d buffer bytes sent\n\n", res);
-	llclose(fd);
+	if(llclose(fd) == -1){
+		printf("llclose error\n");
+		return -1;
+	}
 
 	return 0;
 }

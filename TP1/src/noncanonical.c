@@ -32,10 +32,17 @@ int main(int argc, char** argv)
 
 
 	int fd = llopen(port, RECEIVER);
+	if(fd == -1){
+		printf("llopen error\n");
+		return -1;
+	}
 	unsigned char frame[256];
 	int res = llread(fd, frame);
 	printf("\n%d buffer bytes recevied\n\n", res);
-	llclose(fd);
+	if(llclose(fd) == -1){
+		printf("llclose error\n");
+		return -1;
+	}
 
 	return 0;
 }
