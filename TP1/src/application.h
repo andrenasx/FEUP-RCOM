@@ -30,3 +30,5 @@ typedef struct {
 	int sentFileSize;
 	int recFileSize;
 } applicationLayer;
+
+int sendControlPacket(unsigned char control_field);
