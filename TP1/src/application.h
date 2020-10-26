@@ -33,3 +33,5 @@ typedef struct {
 
 int sendControlPacket(unsigned char control_field);
 int readControlPacket();
+int sendDataPacket();
+int readDataPacket(unsigned char *packet);

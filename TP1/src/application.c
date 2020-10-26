@@ -29,6 +29,34 @@ int sendControlPacket(unsigned char control_field){
     return 0;
 }
 
+int sendDataPacket(){
+	char buf[MAX_DATA_SIZE];
+	int numbytes = 0, sequenceNumber = 0;
+
+	while((numbytes = read(applayer.sent_file_fd, &buf, MAX_DATA_SIZE)) != 0){
+		unsigned char packet[MAX_DATA_SIZE + numbytes];
+
+		//build data packet
+		packet[0] = C_DATA;
+		packet[1] = sequenceNumber % 255;
+		packet[2] = numbytes / 256;
+		packet[3] = numbytes % 256;
+		memcpy(&packet[4], &buf, numbytes);
+		
+		if(llwrite(applayer.serial_fd, packet, numbytes + CONTROL_PACKET_SIZE) == -1){
+        	printf("Error sending the data packet\n");
+        	return -1;
+    	}
+    	else
+        	printf("Sent Data Packet\n");
+		
+		sequenceNumber++;
+
+	}
+	
+	return 0;
+}
+
 
 int readControlPacket(){
 	int index = 0;
@@ -80,4 +108,17 @@ int readControlPacket(){
 	applayer.serial_fd = open(applayer.recFileName, O_RDWR | O_CREAT, 0777);
 
 	return applayer.serial_fd;
+}
+
+int readDataPacket(unsigned char *packet){
+	int dataSize = 256 * packet[2] + packet[3];
+
+	if(write(applayer.rec_file_fd, &packet[4], dataSize) == -1){
+		printf("Error writting data packet to file\n");
+		return -1;
+	}
+	else
+		printf("Wrote data packet to file\n");
+	
+	return 0;
 }
