@@ -244,11 +244,13 @@ int readAck(int fd){
 
     if(linklayer.sequenceNumber == 0 && control_field == C_RR1){
         printf("Received RR1\n");
+        linklayer.sequenceNumber = 1;
         return 0;
     }
 
     else if(linklayer.sequenceNumber == 1 && control_field == C_RR0){
         printf("Received RR0\n");
+        linklayer.sequenceNumber = 0;
         return 0;
     }
 

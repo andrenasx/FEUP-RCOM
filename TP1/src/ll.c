@@ -166,10 +166,10 @@ int llwrite(int fd, char* buffer, int length){
 
     unsetAlarm();
     if(linklayer.numTransmissions >= MAX_TRANSMISSIONS){
-            printf("Reached max retries\n");
-            return -1;
-        }
-        linklayer.numTransmissions=0;
+        printf("Reached max retries\n");
+        return -1;
+    }
+    linklayer.numTransmissions=0;
     
     return length;
 }
