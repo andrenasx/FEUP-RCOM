@@ -1,10 +1,10 @@
 CC = gcc
 CFLAGS = -Wall
-OBJ = src/messages.o src/ll.o src/alarm.o
-DEPS = src/macros.h src/messages.h src/ll.h src/alarm.h
-TARGETS = cable writenoncanonical noncanonical
+OBJ = src/messages.o src/alarm.o src/ll.o src/application.o
+DEPS = src/macros.h src/messages.h src/alarm.h src/ll.h src/application.h
+TARGETS = main
 
-all: cable writenoncanonical noncanonical
+all: main
 
 %.o: %.c $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -12,10 +12,7 @@ all: cable writenoncanonical noncanonical
 cable:
 	$(CC) $(CFLAGS) -o $@ src/$@.c
 
-writenoncanonical: $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $@ src/$@.c -lm
-
-noncanonical: $(OBJ)
+main: $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ src/$@.c -lm
 
 clean:

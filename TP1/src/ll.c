@@ -273,7 +273,7 @@ int llread(int fd, unsigned char *buffer) {
                         printf("Error sending RR0\n");
                     }
                     else {
-                        printf("Sent RR1\n");
+                        printf("Sent RR0\n");
                     }
                 }
 

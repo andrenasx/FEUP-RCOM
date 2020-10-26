@@ -26,7 +26,7 @@ int sendFile(int fd, char *file_name){
 	}
 
 	// Send Data Packets
-	if (sendDataPackets() == -1) {
+	if (sendDataPacket() == -1) {
 		printf("Error sending Data Packets\n");
 		return -1;
 	}
@@ -43,26 +43,28 @@ int sendFile(int fd, char *file_name){
 int sendControlPacket(unsigned char control_field){
     int index = 0;
     int file_length = sizeof(applayer.sentFileSize);
-    unsigned char packet[CONTROL_PACKET_SIZE + file_length + strlen(applayer.sentFileName)];
+	int packet_size = CONTROL_PACKET_SIZE + file_length + strlen(applayer.sentFileName);
+    unsigned char packet[packet_size];
 
     packet[0] = control_field;
     
     //Insert file size
     packet[1] = T_FILE_SIZE; //type
     packet[2] = file_length; //length
-	memcpy(&packet[3], &file_length, sizeof(file_length)); //file size
+	memcpy(&packet[3], &applayer.sentFileSize, file_length); //file size
 
     //Insert file name
     packet[file_length+3] = T_FILE_NAME; //type
     packet[file_length+4] = strlen(applayer.sentFileName); //length
 	memcpy(&packet[file_length+5], applayer.sentFileName, strlen(applayer.sentFileName)); //file name
     
-    if(llwrite(applayer.serial_fd, packet, index) == -1){
+    if(llwrite(applayer.serial_fd, packet, packet_size) == -1){
         printf("Error llwrite control packet\n");
         return -1;
     }
-    else
-        printf("Sent Control Packet\n");
+    else{
+		printf("Sent Control Packet\n");
+	}
 
     return 0;
 }
@@ -82,11 +84,12 @@ int sendDataPacket(){
 		memcpy(&packet[4], &buf, numbytes);
 		
 		if(llwrite(applayer.serial_fd, packet, numbytes + CONTROL_PACKET_SIZE) == -1){
-        	printf("Error sending the data packet\n");
+        	perror("Error sending the data packet\n");
         	return -1;
     	}
-    	else
-        	printf("Sent Data Packet\n");
+    	else{
+			printf("Sent Data Packet\n");	
+		}
 		
 		sequenceNumber++;
 
@@ -165,16 +168,13 @@ int receiveFile(int fd){
 	unsigned char buf[MAX_DATA_SIZE + DATA_PACKET_SIZE];
 
 	applayer.serial_fd = fd;
-	
+
+	readControlPacket();
+	printf("Read START control packet\n");
+
 	while(1){
 		llread(fd,buf);
-
-		if(buf[0] == C_START){
-			applayer.rec_file_fd = readControlPacket();
-			printf("Read START control packet\n");
-			continue;
-		}
-		else if(buf[0] == C_END){
+		if(buf[0] == C_END){
 			printf("Read END control packet\n");
 			break;
 		}
