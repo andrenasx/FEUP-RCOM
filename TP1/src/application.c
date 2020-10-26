@@ -2,6 +2,44 @@
 
 applicationLayer applayer;
 
+int sendFile(int fd, char *file_name){
+	applayer.sent_file_fd = open(file_name, O_RDONLY);
+	if(applayer.sent_file_fd < 0){
+		printf("Error opening file\n");
+		return -1;
+	}
+
+	struct stat info;
+	if(fstat(applayer.sent_file_fd, &info) == -1){
+		printf("Error in fstat\n");
+		return -1;
+	}
+
+	applayer.serial_fd = fd;
+	applayer.sentFileSize = info.st_size;
+	applayer.sentFileName = file_name;
+
+	// Send Start Control Packet
+	if(sendControlPacket(C_START) == -1){
+		printf("Error sending Start Control Packet\n");
+		return -1;
+	}
+
+	// Send Data Packets
+	if (sendDataPackets() == -1) {
+		printf("Error sending Data Packets\n");
+		return -1;
+	}
+
+	// Send End Control Packet
+	if(sendControlPacket(C_END) == -1){
+		printf("Error sending End Control Packet\n");
+		return -1;
+	}
+
+	return 0;
+}
+
 int sendControlPacket(unsigned char control_field){
     int index = 0;
     int file_length = sizeof(applayer.sentFileSize);
@@ -20,11 +58,11 @@ int sendControlPacket(unsigned char control_field){
 	memcpy(&packet[file_length+5], applayer.sentFileName, strlen(applayer.sentFileName)); //file name
     
     if(llwrite(applayer.serial_fd, packet, index) == -1){
-        printf("Error sending the control packet\n");
+        printf("Error llwrite control packet\n");
         return -1;
     }
     else
-        printf("Sent Control Packet");
+        printf("Sent Control Packet\n");
 
     return 0;
 }
@@ -105,9 +143,9 @@ int readControlPacket(){
 
 	applayer.recFileName = file_name;
 
-	applayer.serial_fd = open(applayer.recFileName, O_RDWR | O_CREAT, 0777);
+	applayer.rec_file_fd = open(applayer.recFileName, O_RDWR | O_CREAT, 0777);
 
-	return applayer.serial_fd;
+	return applayer.rec_file_fd;
 }
 
 int readDataPacket(unsigned char *packet){

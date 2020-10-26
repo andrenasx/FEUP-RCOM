@@ -31,6 +31,7 @@ typedef struct {
 	off_t recFileSize;
 } applicationLayer;
 
+int sendFile(int fd, char *file_name);
 int sendControlPacket(unsigned char control_field);
 int readControlPacket();
 int sendDataPacket();
