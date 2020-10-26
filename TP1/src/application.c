@@ -17,7 +17,7 @@ int sendFile(int fd, char *file_name){
 
 	applayer.serial_fd = fd;
 	applayer.sentFileSize = info.st_size;
-	applayer.sentFileName = file_name;
+	strcpy(applayer.sentFileName, file_name);
 
 	// Send Start Control Packet
 	if(sendControlPacket(C_START) == -1){
@@ -41,7 +41,6 @@ int sendFile(int fd, char *file_name){
 }
 
 int sendControlPacket(unsigned char control_field){
-    int index = 0;
     int file_length = sizeof(applayer.sentFileSize);
 	int packet_size = CONTROL_PACKET_SIZE + file_length + strlen(applayer.sentFileName);
     unsigned char packet[packet_size];
@@ -70,11 +69,11 @@ int sendControlPacket(unsigned char control_field){
 }
 
 int sendDataPacket(){
-	char buf[MAX_DATA_SIZE];
+	char buf[MAX_SIZE];
 	int numbytes = 0, sequenceNumber = 0;
 
-	while((numbytes = read(applayer.sent_file_fd, &buf, MAX_DATA_SIZE)) != 0){
-		unsigned char packet[MAX_DATA_SIZE + numbytes];
+	while((numbytes = read(applayer.sent_file_fd, &buf, MAX_SIZE)) != 0){
+		unsigned char packet[MAX_SIZE + numbytes];
 
 		//build data packet
 		packet[0] = C_DATA;
@@ -99,14 +98,35 @@ int sendDataPacket(){
 }
 
 
-int readControlPacket(){
+int receiveFile(int fd, char *dest){
+	unsigned char packet[MAX_SIZE + CONTROL_PACKET_SIZE];
+
+	applayer.serial_fd = fd;
+	strcpy(applayer.recFileName, dest);
+
+	while(1){
+		llread(fd,packet);
+		if(packet[0] == C_END){
+			printf("Read END control packet\n");
+			break;
+		}
+		else if(packet[0] == C_START){
+			readControlPacket(packet);
+			printf("Read START control packet\n");
+		}
+		else if(packet[0] == C_DATA){
+			readDataPacket(packet);
+		}
+	}
+	close(applayer.rec_file_fd);
+	return 0;
+}
+
+int readControlPacket(unsigned char *packet){
 	int index = 0;
 	int size_length;
 	off_t file_size = 0;
 	char* file_name;
-
-	unsigned char packet[MAX_DATA_SIZE];
-	llread(applayer.serial_fd, packet);
 
 	//FILE SIZE
 	if(packet[1] == T_FILE_SIZE){
@@ -116,7 +136,7 @@ int readControlPacket(){
 			file_size += packet[i] << 8 * j;
 		}
 
-		printf("File size: %d bytes\n", file_size);
+		printf("File size: %ld bytes\n", file_size);
 	}
 
 	if (file_size <= 0) {
@@ -144,7 +164,7 @@ int readControlPacket(){
 		printf("File Name: %s\n", file_name);
 	}
 
-	applayer.recFileName = file_name;
+	strcat(applayer.recFileName, file_name);
 
 	applayer.rec_file_fd = open(applayer.recFileName, O_RDWR | O_CREAT, 0777);
 
@@ -161,27 +181,5 @@ int readDataPacket(unsigned char *packet){
 	else
 		printf("Wrote data packet to file\n");
 	
-	return 0;
-}
-
-int receiveFile(int fd){
-	unsigned char buf[MAX_DATA_SIZE + DATA_PACKET_SIZE];
-
-	applayer.serial_fd = fd;
-
-	readControlPacket();
-	printf("Read START control packet\n");
-
-	while(1){
-		llread(fd,buf);
-		if(buf[0] == C_END){
-			printf("Read END control packet\n");
-			break;
-		}
-		else if(buf[0] == C_DATA){
-			readDataPacket(buf);
-		}
-	}
-	close(applayer.rec_file_fd);
 	return 0;
 }

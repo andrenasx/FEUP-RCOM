@@ -22,3 +22,5 @@
 #define BCC(a,c) (a ^ c)
 
 #define VERIFY_C(c) (c == C_SET || c == C_DISC || c == C_UA || c == C_RR0 || c == C_RR1 || c == C_REJ0 || c == C_REJ1) ? 1 : 0
+
+#define MAX_SIZE 1024

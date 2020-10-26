@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 
 	// Init application
 	if(flag==RECEIVER){
-		receiveFile(fd);
+		receiveFile(fd, argv[2]);
 	}
 	else if(flag==TRANSMITTER){
 		sendFile(fd, argv[2]);

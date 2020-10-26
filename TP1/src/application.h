@@ -19,22 +19,20 @@
 
 #define DATA_PACKET_SIZE 4
 #define CONTROL_PACKET_SIZE 5
-#define MAX_DATA_SIZE 1024
 
 typedef struct {
     int serial_fd;
     int sent_file_fd;
     int rec_file_fd;
-    char* sentFileName;
-	char* recFileName;
+    char sentFileName[256];
+	char recFileName[256];
 	off_t sentFileSize;
 	off_t recFileSize;
 } applicationLayer;
 
 int sendFile(int fd, char *file_name);
 int sendControlPacket(unsigned char control_field);
-int readControlPacket();
 int sendDataPacket();
+int receiveFile(int fd, char *dest);
+int readControlPacket(unsigned char *packet);
 int readDataPacket(unsigned char *packet);
-
-int receiveFile(int fd);

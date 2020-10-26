@@ -20,7 +20,6 @@
 
 typedef struct {
     char port[20]; // /dev/ttySx
-    int baudRate;  //transmission speed
     int flag; //TRANSMITTER/RECEIVER
     unsigned int sequenceNumber; //trama sequence
     unsigned int timeout;
@@ -36,7 +35,7 @@ void setDataLinkLayer(int port, int flag);
 //ll functions
 int llopen(int port, int flag);
 int llclose(int fd);
-int llwrite(int fd, char* buffer, int length);
+int llwrite(int fd, unsigned char* buffer, int length);
 int llread(int fd, unsigned char *buffer);
 
 int openSerial();

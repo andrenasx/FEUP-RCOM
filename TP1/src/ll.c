@@ -8,11 +8,50 @@ void setDataLinkLayer(int port, int flag){
     snprintf(porta, 12, "/dev/ttyS%d", port);
     strcpy(linklayer.port, porta);
     linklayer.flag = flag;
-    linklayer.baudRate = BAUDRATE;
     linklayer.numTransmissions = 0;
     linklayer.alarm = 0;
     linklayer.timeout = 1;
     linklayer.sequenceNumber = 0;
+}
+
+int openSerial(){
+    /*
+	Open serial port device for reading and writing and not as controlling tty
+	because we don't want to get killed if linenoise sends CTRL-C.
+    */
+    int fd = open(linklayer.port, O_RDWR | O_NOCTTY );
+	if (fd <0) {perror(linklayer.port); exit(-1); }
+
+	if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
+		perror("tcgetattr");
+		exit(-1);
+	}
+
+	bzero(&newtio, sizeof(newtio));
+	newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+	newtio.c_iflag = IGNPAR;
+	newtio.c_oflag = 0;
+
+	/* set input mode (non-canonical, no echo,...) */
+	newtio.c_lflag = 0;
+
+	newtio.c_cc[VTIME] = 0;   /* inter-character timer unused */
+	newtio.c_cc[VMIN] = 1;   /* blocking read until 1 chars received */
+
+  /* 
+	VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
+	leitura do(s) pr�ximo(s) caracter(es)
+  */
+
+	tcflush(fd, TCIOFLUSH);
+
+	if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
+		perror("tcsetattr");
+		exit(-1);
+	}
+
+	printf("New termios structure set\n");
+    return fd;
 }
 
 int llopen(int port, int flag){
@@ -148,7 +187,7 @@ int llclose(int fd){
     return 0;
 }
 
-int llwrite(int fd, char* buffer, int length){
+int llwrite(int fd, unsigned char* buffer, int length){
     do{
         // Send frame
         writeStuffedFrame(fd, buffer, length);
@@ -174,53 +213,13 @@ int llwrite(int fd, char* buffer, int length){
     return length;
 }
 
-int openSerial(){
-    /*
-	Open serial port device for reading and writing and not as controlling tty
-	because we don't want to get killed if linenoise sends CTRL-C.
-    */
-    int fd = open(linklayer.port, O_RDWR | O_NOCTTY );
-	if (fd <0) {perror(linklayer.port); exit(-1); }
-
-	if ( tcgetattr(fd,&oldtio) == -1) { /* save current port settings */
-		perror("tcgetattr");
-		exit(-1);
-	}
-
-	bzero(&newtio, sizeof(newtio));
-	newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
-	newtio.c_iflag = IGNPAR;
-	newtio.c_oflag = 0;
-
-	/* set input mode (non-canonical, no echo,...) */
-	newtio.c_lflag = 0;
-
-	newtio.c_cc[VTIME] = 0;   /* inter-character timer unused */
-	newtio.c_cc[VMIN] = 1;   /* blocking read until 1 chars received */
-
-  /* 
-	VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
-	leitura do(s) pr�ximo(s) caracter(es)
-  */
-
-	tcflush(fd, TCIOFLUSH);
-
-	if ( tcsetattr(fd,TCSANOW,&newtio) == -1) {
-		perror("tcsetattr");
-		exit(-1);
-	}
-
-	printf("New termios structure set\n");
-    return fd;
-}
-
 int llread(int fd, unsigned char *buffer) {
     int received = 0;
     int frame_length = 0;
     int dframe_length = 0;
     int packet_length = 0;
-    unsigned char frame[256];
-    unsigned char dframe[256];
+    unsigned char frame[MAX_SIZE];
+    unsigned char dframe[MAX_SIZE];
     unsigned char control;
 
     while(!received){
