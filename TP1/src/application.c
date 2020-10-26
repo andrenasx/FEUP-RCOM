@@ -122,3 +122,28 @@ int readDataPacket(unsigned char *packet){
 	
 	return 0;
 }
+
+int receiveFile(int fd){
+	unsigned char buf[MAX_DATA_SIZE + DATA_PACKET_SIZE];
+
+	applayer.serial_fd = fd;
+	
+	while(1){
+		llread(fd,buf);
+
+		if(buf[0] == C_START){
+			applayer.rec_file_fd = readControlPacket();
+			printf("Read START control packet\n");
+			continue;
+		}
+		else if(buf[0] == C_END){
+			printf("Read END control packet\n");
+			break;
+		}
+		else if(buf[0] == C_DATA){
+			readDataPacket(buf);
+		}
+	}
+	close(applayer.rec_file_fd);
+	return 0;
+}
