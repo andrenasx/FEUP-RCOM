@@ -27,9 +27,9 @@ typedef struct {
     int rec_file_fd;
     char* sentFileName;
 	char* recFileName;
-	int sentFileSize;
-	int recFileSize;
+	off_t sentFileSize;
+	off_t recFileSize;
 } applicationLayer;
 
 int sendControlPacket(unsigned char control_field);
-int readControlPacket(unsigned char control_field);
+int readControlPacket();

@@ -7,23 +7,18 @@ int sendControlPacket(unsigned char control_field){
     int file_length = sizeof(applayer.sentFileSize);
     unsigned char packet[CONTROL_PACKET_SIZE + file_length + strlen(applayer.sentFileName)];
 
-    packet[index++] = control_field;
+    packet[0] = control_field;
     
     //Insert file size
-    packet[index++] = T_FILE_SIZE; //type
-    packet[index++] = file_length; //length
-
-    for(int i = 0; i < file_length; i++){
-        packet[index++] = (applayer.sentFileSize >> 8*(file_length - 1 - i)) & 0xFF; //value ??
-    }
+    packet[1] = T_FILE_SIZE; //type
+    packet[2] = file_length; //length
+	memcpy(&packet[3], &file_length, sizeof(file_length)); //file size
 
     //Insert file name
-    packet[index++] = T_FILE_NAME; //type
-    packet[index++] = strlen(applayer.sentFileName); //length
-
-    for(int i = 0; i < applayer.sentFileName; i++){
-        packet[index++] = applayer.sentFileName[i]; //value
-    }
+    packet[file_length+3] = T_FILE_NAME; //type
+    packet[file_length+4] = strlen(applayer.sentFileName); //length
+	memcpy(&packet[file_length+5], applayer.sentFileName, strlen(applayer.sentFileName)); //file name
+    
     if(llwrite(applayer.serial_fd, packet, index) == -1){
         printf("Error sending the control packet\n");
         return -1;
@@ -35,36 +30,22 @@ int sendControlPacket(unsigned char control_field){
 }
 
 
-int readControlPacket(unsigned char control){
+int readControlPacket(){
 	int index = 0;
-	int file_size = 0;
+	int size_length;
+	off_t file_size = 0;
 	char* file_name;
 
 	unsigned char packet[MAX_DATA_SIZE];
 	llread(applayer.serial_fd, packet);
 
-    if(packet[index++] != control) {
-        printf("Wrong control packet");
-        return -1;
-    }
-
 	//FILE SIZE
-	if(packet[index] == T_FILE_SIZE){
-		index++;
-		int size_length = packet[index];
-		index++;
+	if(packet[1] == T_FILE_SIZE){
+		size_length = packet[2];
 
-		for (int i = 0; i < size_length; i++){
-			file_size += packet[index] << 8 * (size_length - 1 - i);
-			index++;
+		for (int i=3, j=0; i < size_length+3; i++, j++){
+			file_size += packet[i] << 8 * j;
 		}
-
-		// if (app.receivedFileSize != 0){
-		// 	if(app.receivedFileSize == file_size){
-		// 		printf("Start Control Packet and End Control Packet data does not match\n");
-		// 		return -1;
-		// 	}
-		// }
 
 		printf("File size: %d bytes\n", file_size);
 	}
@@ -76,33 +57,27 @@ int readControlPacket(unsigned char control){
 
 	applayer.recFileSize = file_size;
 
+	index = size_length+3;
+
 	//FILE NAME
 	if (packet[index] == T_FILE_NAME) {
 		index++;
 		int name_length = packet[index];
 		index++;
 
-		file_name = (char*) malloc(name_length + 1);
+		file_name = malloc(sizeof(char) * (name_length + 1));
 		for (int i = 0; i < name_length; i++) {
 			file_name[i] = packet[index];
 			index++;
 		}
-
 		file_name[name_length] = '\0';
 
-		// if (app.receivedFilename != NULL){
-		// 	if(app.receivedFilename == file_name){
-		// 		printf("Start Control Packet and End Control Packet data does not match\n");
-		// 		return -1;
-		// 	}
-		// }
-
-		printf("File Name: %s\n\n", file_name);
+		printf("File Name: %s\n", file_name);
 	}
 
 	applayer.recFileName = file_name;
 
-	applayer.serial_fd = open(applayer.recFileName, O_WRONLY | O_CREAT | O_APPEND);
+	applayer.serial_fd = open(applayer.recFileName, O_RDWR | O_CREAT, 0777);
 
 	return applayer.serial_fd;
 }
