@@ -240,13 +240,15 @@ int readAck(int fd){
         return 0;
     }
 
-    else if(linklayer.sequenceNumber == 0 && control_field == C_REJ1){
-        printf("Received REJ1\n");
+    else if(control_field == C_REJ0){
+        printf("Received REJ0\n");
+        linklayer.numTransmissions++;
         return -1;
     }
 
-    else if(linklayer.sequenceNumber == 1 && control_field == C_REJ0){
+    else if(control_field == C_REJ1){
         printf("Received REJ1\n");
+        linklayer.numTransmissions++;
         return -1;
     }
 
@@ -265,12 +267,9 @@ int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
 
     // BCC2 before byte stuffing
     unsigned char bcc2 = buffer[0];
-    printf("Byte: %4.2x\n", buffer[0]);
     for(int i=1; i<length; i++){
         bcc2 ^= buffer[i];
-        printf("Byte %d: %4.2x\n",i, buffer[i]);
     }
-    printf("LENGTH %d", length);
 
     // Process data
     int dataIndex=0, frameIndex=4;

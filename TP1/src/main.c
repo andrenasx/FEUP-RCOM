@@ -35,10 +35,16 @@ int main(int argc, char** argv) {
 
 	// Init application
 	if(flag==RECEIVER){
-		receiveFile(fd, argv[2]);
+		if(receiveFile(fd, argv[2]) == -1){
+			printf("Error receiving file\n");
+			return -1;
+		}
 	}
 	else if(flag==TRANSMITTER){
-		sendFile(fd, argv[2]);
+		if(sendFile(fd, argv[2]) == -1){
+			printf("Error sending file\n");
+			return -1;
+		}
 	}
 	else {
 		printf("Flag error\n");

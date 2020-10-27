@@ -73,7 +73,7 @@ int sendDataPacket(){
 	int numbytes = 0, sequenceNumber = 0;
 
 	while((numbytes = read(applayer.sent_file_fd, &buf, MAX_SIZE)) != 0){
-		unsigned char packet[MAX_SIZE + numbytes];
+		unsigned char packet[DATA_PACKET_SIZE + numbytes];
 
 		//build data packet
 		packet[0] = C_DATA;
@@ -82,7 +82,7 @@ int sendDataPacket(){
 		packet[3] = numbytes % 256;
 		memcpy(&packet[4], &buf, numbytes);
 		
-		if(llwrite(applayer.serial_fd, packet, numbytes + CONTROL_PACKET_SIZE) == -1){
+		if(llwrite(applayer.serial_fd, packet, numbytes + DATA_PACKET_SIZE) == -1){
         	perror("Error sending the data packet\n");
         	return -1;
     	}
@@ -106,8 +106,10 @@ int receiveFile(int fd, char *dest){
 
 	printf("Reading packets\n");
 	while(1){
-		llread(fd,packet);
-		printf("PACKET: %4.2x", packet[0]);
+		if(llread(fd,packet) == -1){
+			perror("Error reading the data packet\n");
+        	return -1;
+		}
 		if(packet[0] == C_END){
 			printf("Read END control packet\n");
 			break;

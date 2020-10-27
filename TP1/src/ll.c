@@ -182,9 +182,7 @@ int llclose(int fd){
 		exit(-1);
 	}
 
-	close(fd);
-
-    return 0;
+	return close(fd);
 }
 
 int llwrite(int fd, unsigned char* buffer, int length){
@@ -193,14 +191,7 @@ int llwrite(int fd, unsigned char* buffer, int length){
         writeStuffedFrame(fd, buffer, length);
         setAlarm();
         // Read receiver ACK
-        if(readAck(fd) == -1){ //check REJ/RR
-            unsetAlarm();
-            continue;
-        }
-        else {
-            //printf("RR received\n");
-        }
-
+        readAck(fd);
     }while(linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
     unsetAlarm();
@@ -218,7 +209,7 @@ int llread(int fd, unsigned char *buffer) {
     int frame_length = 0;
     int dframe_length = 0;
     int packet_length = 0;
-    unsigned char frame[MAX_SIZE];
+    unsigned char frame[2*MAX_SIZE+6];
     unsigned char dframe[MAX_SIZE];
     unsigned char control;
 
@@ -231,12 +222,9 @@ int llread(int fd, unsigned char *buffer) {
 
             // Calculate BCC2 after destuffing
             unsigned char bcc2 = dframe[4];
-            printf("Byte: %4.2x\n", dframe[4]);
             for(int i=5; i<dframe_length-7+5; i++){
                 bcc2 ^= dframe[i];
-                printf("Byte %d: %4.2x\n",i-4, dframe[i]);
             }
-            printf("LENGTH %d",dframe_length-6);
 
             // Verify if calculted BCC2 matches with received BCC2
             if(bcc2!=dframe[dframe_length-2]){
