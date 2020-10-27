@@ -104,8 +104,10 @@ int receiveFile(int fd, char *dest){
 	applayer.serial_fd = fd;
 	strcpy(applayer.recFileName, dest);
 
+	printf("Reading packets\n");
 	while(1){
 		llread(fd,packet);
+		printf("PACKET: %4.2x", packet[0]);
 		if(packet[0] == C_END){
 			printf("Read END control packet\n");
 			break;
@@ -116,6 +118,7 @@ int receiveFile(int fd, char *dest){
 		}
 		else if(packet[0] == C_DATA){
 			readDataPacket(packet);
+			printf("Read DATA packet\n");
 		}
 	}
 	close(applayer.rec_file_fd);

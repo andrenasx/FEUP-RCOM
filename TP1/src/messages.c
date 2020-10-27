@@ -41,14 +41,12 @@ unsigned char processFrameSU(enum states *state, unsigned char byte){
         case START:
             if (byte == FLAG) {
                 *state = FLAG_RCV;
-                printf("F:\t%#4.2x\n", byte);
             }
             break;
 
         case FLAG_RCV:
             if (byte == A_ER) {
                 *state = A_RCV;
-                printf("A:\t%#4.2x\n", byte);
             }
             else if (byte!= FLAG){
                 *state = START;
@@ -59,7 +57,6 @@ unsigned char processFrameSU(enum states *state, unsigned char byte){
             if (VERIFY_C(byte)) {
                 *state = C_RCV;
                 c = byte;
-                printf("C:\t%#4.2x\n", byte);
             }
             else if (byte == FLAG){
                 *state = FLAG_RCV;
@@ -72,7 +69,6 @@ unsigned char processFrameSU(enum states *state, unsigned char byte){
         case C_RCV:
             if (byte == BCC(A_ER,c)){
                 *state = BCC_OK;
-                printf("BCC1:\t%#4.2x\n", byte);
             }
             else if (byte == FLAG){
                 *state = FLAG_RCV;
@@ -85,7 +81,6 @@ unsigned char processFrameSU(enum states *state, unsigned char byte){
         case BCC_OK:
             if (byte == FLAG){
                 *state = STOP;
-                printf("F:\t%#4.2x\n", byte);
             }
             else{
                 *state = START;
@@ -107,14 +102,12 @@ void processFrameI(enum states *state, unsigned char byte){
         case START:
             if (byte == FLAG) {
                 *state = FLAG_RCV;
-                printf("F:\t%#4.2x\n", byte);
             }
             break;
 
         case FLAG_RCV:
             if (byte == A_ER) {
                 *state = A_RCV;
-                printf("A:\t%#4.2x\n", byte);
             }
             else if (byte!= FLAG){
                 *state = START;
@@ -125,7 +118,6 @@ void processFrameI(enum states *state, unsigned char byte){
             if ((byte==C_I0 && linklayer.sequenceNumber==0) || (byte==C_I1 && linklayer.sequenceNumber==1)) {
                 *state = C_RCV;
                 c = byte;
-                printf("C:\t%#4.2x\n", byte);
             }
             else if (byte == FLAG){
                 *state = FLAG_RCV;
@@ -138,7 +130,6 @@ void processFrameI(enum states *state, unsigned char byte){
         case C_RCV:
             if (byte == BCC(A_ER,c)){
                 *state = BCC_OK;
-                printf("BCC1:\t%#4.2x\n", byte);
             }
             else if (byte == FLAG){
                 *state = FLAG_RCV;
@@ -151,7 +142,6 @@ void processFrameI(enum states *state, unsigned char byte){
         case BCC_OK:
             if (byte != FLAG){
                 *state = DATA;
-                printf("D:\t%#4.2x\n", byte);
             }
             else{
                 *state = START;
@@ -159,11 +149,7 @@ void processFrameI(enum states *state, unsigned char byte){
             break;
         case DATA:
             if (byte == FLAG){
-                printf("F:\t%#4.2x\n", byte);
                 *state = STOP;
-            }
-            else {
-                printf("D:\t%#4.2x\n", byte);
             }
         case STOP:
             break;
@@ -279,9 +265,12 @@ int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
 
     // BCC2 before byte stuffing
     unsigned char bcc2 = buffer[0];
+    printf("Byte: %4.2x\n", buffer[0]);
     for(int i=1; i<length; i++){
         bcc2 ^= buffer[i];
+        printf("Byte %d: %4.2x\n",i, buffer[i]);
     }
+    printf("LENGTH %d", length);
 
     // Process data
     int dataIndex=0, frameIndex=4;

@@ -231,9 +231,12 @@ int llread(int fd, unsigned char *buffer) {
 
             // Calculate BCC2 after destuffing
             unsigned char bcc2 = dframe[4];
+            printf("Byte: %4.2x\n", dframe[4]);
             for(int i=5; i<dframe_length-7+5; i++){
                 bcc2 ^= dframe[i];
+                printf("Byte %d: %4.2x\n",i-4, dframe[i]);
             }
+            printf("LENGTH %d",dframe_length-6);
 
             // Verify if calculted BCC2 matches with received BCC2
             if(bcc2!=dframe[dframe_length-2]){
