@@ -52,5 +52,6 @@ int llwrite(int fd, unsigned char* buffer, int length);
 int llread(int fd, unsigned char *buffer);
 
 int openSerial();
+int closeSerial(int fd);
 
-int displayStats();
+void displayStats();

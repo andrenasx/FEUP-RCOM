@@ -164,12 +164,8 @@ int readCommand(int fd){
     enum states state = START;
 	
     while (state != STOP) {       /* loop for input */
-        if (read(fd,&byte,1) == -1){ /* returns after 1 char has been input */
-            printf("Error reading SET byte\n");
-        }
-        else{
-            processFrameSU(&state, byte);
-        }
+        read(fd,&byte,1);
+        processFrameSU(&state, byte);
     }
 
     return 0;
@@ -180,12 +176,8 @@ int readResponse(int fd){
     enum states state = START;
 
     while(state!=STOP && !linklayer.alarm) {
-        if (read(fd, &byte, 1) == -1){
-            printf("Error reading UA byte\n");
-        }
-        else{
-            processFrameSU(&state, byte);
-        }
+        read(fd, &byte, 1);
+        processFrameSU(&state, byte);
     }
 
     if(linklayer.alarm) return -1;
@@ -199,16 +191,13 @@ int readFrameI(int fd, unsigned char *frame){
     enum states state = START;
 	
     while (state != STOP) {       /* loop for input */
-        if (read(fd,&byte,1) == -1){ /* returns after 1 char has been input */
-            printf("Error reading I byte\n");
-        }
-        else{
-            processFrameI(&state, byte);
+        read(fd,&byte,1);
 
-            if(state == FLAG_RCV && length !=0) length = 0;
+        processFrameI(&state, byte);
 
-            frame[length++] = byte;
-        }
+        if(state == FLAG_RCV && length !=0) length = 0;
+
+        frame[length++] = byte;
     }
     linklayer.stats.numReceivedFramesI++;
     return length;
@@ -220,12 +209,8 @@ int readAck(int fd){
     unsigned char control_field;
 
     while(state!=STOP && !linklayer.alarm) {
-        if (read(fd, &byte, 1) == -1){
-            printf("Error reading ACK byte\n");
-        }
-        else{
-            control_field = processFrameSU(&state, byte);
-        }
+        read(fd, &byte, 1);
+        control_field = processFrameSU(&state, byte);
     }
 
     if(linklayer.sequenceNumber == 0 && control_field == C_RR1){

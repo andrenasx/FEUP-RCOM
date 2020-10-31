@@ -20,9 +20,9 @@ void setDataLinkLayer(int port, int flag){
     stats.numReceivedRR = 0;
     stats.numSentREJ = 0;
     stats.numReceivedREJ = 0;
-    if(timespec_get(&stats.start, TIME_UTC) != TIME_UTC) {
-		printf("Error in calling timespec_get\n");
-		exit(EXIT_FAILURE);
+    if(clock_gettime(CLOCK_MONOTONIC, &stats.start) < 0) {
+		printf("Error in start clock_gettime\n");
+		exit(-1);
     }
     linklayer.stats = stats;
 }
@@ -64,7 +64,26 @@ int openSerial(){
 	}
 
 	printf("New termios structure set\n");
+    printf("\n***Started Connection***\n\n");
     return fd;
+}
+
+int closeSerial(int fd){
+    if(clock_gettime(CLOCK_MONOTONIC, &linklayer.stats.end) < 0) {
+		printf("Error in end clock_gettime\n");
+		exit(-1);
+    }
+
+    tcflush(fd, TCIOFLUSH);
+
+    if (tcsetattr(fd,TCSANOW,&oldtio) == -1) {
+		perror("tcsetattr");
+		exit(-1);
+	}
+
+    printf("\n***Closed Connection***\n\n");
+
+    return close(fd);
 }
 
 int llopen(int port, int flag){
@@ -120,6 +139,8 @@ int llopen(int port, int flag){
         }
 
     }
+
+    printf("\n***Established Connection***\n\n");
 
     return fd; 
 }
@@ -190,22 +211,15 @@ int llclose(int fd){
         }
     }
 
-    if (tcsetattr(fd,TCSANOW,&oldtio) == -1) {
-		perror("tcsetattr");
-		exit(-1);
-	}
+    printf("\n***Terminated Connection***\n\n");
 
-    if(timespec_get(&linklayer.stats.end, TIME_UTC) != TIME_UTC) {
-		printf("Error in calling timespec_get\n");
-		exit(EXIT_FAILURE);
-    }
-	return close(fd);
+	return closeSerial(fd);
 }
 
 int llwrite(int fd, unsigned char* buffer, int length){
     do{
         // Send frame
-        writeStuffedFrame(fd, buffer, length);
+        if (writeStuffedFrame(fd, buffer, length)) printf("Sent Frame\n");
         setAlarm();
         // Read receiver ACK
         if(readAck(fd) == -1){
@@ -236,6 +250,7 @@ int llread(int fd, unsigned char *buffer) {
 
     while(!received){
         if((frame_length = readFrameI(fd, frame))){
+            printf("Received Frame\n");	
             control = frame[2];
 
             // Destuff received frame
@@ -253,14 +268,23 @@ int llread(int fd, unsigned char *buffer) {
                 
                 // If not, send REJ
                 if(control == C_I0){
-                    sendREJ0(fd);
-                    linklayer.stats.numSentREJ++;
-                    printf("Sent REJ0\n");
+                    if(sendREJ0(fd) == -1){
+                        printf("Error sending REJ0\n");
+                    }
+                    else {
+                        linklayer.stats.numSentREJ++;
+                        printf("Sent REJ0\n");
+                    }
+                    
                 }
                 else if(control == C_I1){
-                    sendREJ1(fd);
-                    linklayer.stats.numSentREJ++;
-                    printf("Sent REJ1\n");
+                    if(sendREJ1(fd) == -1){
+                       printf("Error sending REJ1\n");
+                    }
+                    else {
+                        linklayer.stats.numSentREJ++;
+                        printf("Sent REJ1\n");
+                    }
                 }
 
                 return -1;
@@ -305,9 +329,9 @@ int llread(int fd, unsigned char *buffer) {
     return packet_length;
 }
 
-int displayStats() {
-	printf("\n***Statistics:***\n\n");
-	printf("Total execution time: %f seconds\n",  (double)(linklayer.stats.end.tv_sec - linklayer.stats.start.tv_sec) + ((double)(linklayer.stats.end.tv_nsec - linklayer.stats.start.tv_nsec)/1000000000L));
+void displayStats() {
+	printf("\n\n***Statistics:***\n\n");
+	printf("Total execution time: %f seconds\n",  (double)(linklayer.stats.end.tv_sec - linklayer.stats.start.tv_sec) + ((double)(linklayer.stats.end.tv_nsec - linklayer.stats.start.tv_nsec)/1000000000.0));
 	printf("Number of sent Frames I: %d\n", linklayer.stats.numSentFramesI);
 	printf("Number of received Frames I: %d\n", linklayer.stats.numReceivedFramesI);
 	printf("Number of timeouts: %d\n", linklayer.stats.numTimeouts);
@@ -316,5 +340,4 @@ int displayStats() {
 	printf("Number of sent Frames REJ: %d\n", linklayer.stats.numSentREJ);
 	printf("Number of received Frames REJ: %d\n", linklayer.stats.numReceivedREJ);
 	printf("\n");
-	return 0;
 }

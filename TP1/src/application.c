@@ -62,7 +62,7 @@ int sendControlPacket(unsigned char control_field){
         return -1;
     }
     else{
-		printf("Sent Control Packet\n");
+		printf("\n***Sent Control Packet successfully***\n\n");
 	}
 
     return 0;
@@ -87,7 +87,7 @@ int sendDataPacket(){
         	return -1;
     	}
     	else{
-			printf("Sent Data Packet\n");	
+			printf("\n***Sent DATA Packet successfully***\n\n");	
 		}
 		
 		sequenceNumber++;
@@ -104,7 +104,6 @@ int receiveFile(int fd, char *dest){
 	applayer.serial_fd = fd;
 	strcpy(applayer.recFileName, dest);
 
-	printf("Reading packets\n");
 	while(1){
 		if(llread(fd,packet) <= 0){
 			printf("Error reading the packet\n");
@@ -112,16 +111,14 @@ int receiveFile(int fd, char *dest){
         	continue;
 		}
 		if(packet[0] == C_END){
-			printf("Read END control packet\n");
+			printf("\n***Received END Control Packet successfully***\n\n");
 			break;
 		}
 		else if(packet[0] == C_START){
-			readControlPacket(packet);
-			printf("Read START control packet\n");
+			if (readControlPacket(packet)!= -1) printf("\n***Received START Control Packet successfully***\n\n");
 		}
 		else if(packet[0] == C_DATA){
-			readDataPacket(packet);
-			printf("Read DATA packet\n");
+			if (readDataPacket(packet)!= -1) printf("\n***Received DATA Packet successfully***\n\n");
 		}
 	}
 	close(applayer.rec_file_fd);
