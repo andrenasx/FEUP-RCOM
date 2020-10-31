@@ -1,10 +1,10 @@
 CC = gcc
 CFLAGS = -Wall
-OBJ = src/messages.o src/alarm.o src/ll.o src/application.o
-DEPS = src/macros.h src/messages.h src/alarm.h src/ll.h src/application.h
-TARGETS = main
+OBJ = src/messages.o src/alarm.o src/ll.o
+DEPS = src/macros.h src/messages.h src/alarm.h src/ll.h
+TARGETS = application
 
-all: main
+all: application
 
 %.o: %.c $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -12,7 +12,7 @@ all: main
 cable:
 	$(CC) $(CFLAGS) -o $@ src/$@.c
 
-main: $(OBJ)
+application: $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ src/$@.c -lm
 
 clean:
