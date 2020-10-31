@@ -18,6 +18,18 @@
 #define RECEIVER 1
 #define MAX_TRANSMISSIONS 3
 
+typedef struct 
+{
+    unsigned int numSentFramesI;
+    unsigned int numReceivedFramesI;
+    unsigned int numTimeouts;
+    unsigned int numSentRR;
+    unsigned int numReceivedRR;
+    unsigned int numSentREJ;
+    unsigned int numReceivedREJ;
+    struct timespec start, end;
+}statistics;
+
 typedef struct {
     char port[20]; // /dev/ttySx
     int flag; //TRANSMITTER/RECEIVER
@@ -26,6 +38,7 @@ typedef struct {
     unsigned int numTransmissions; //atempt number in case of failure
     unsigned int alarm;
     char frame[256]; //trama
+    statistics stats;
 } linkLayer;
 
 extern linkLayer linklayer;
@@ -39,3 +52,5 @@ int llwrite(int fd, unsigned char* buffer, int length);
 int llread(int fd, unsigned char *buffer);
 
 int openSerial();
+
+int displayStats();

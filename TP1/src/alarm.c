@@ -9,6 +9,7 @@ void alarmHandler(int signal) {
 
     linklayer.alarm = 1;
     linklayer.numTransmissions++;
+    linklayer.stats.numTimeouts++;
 }
 
 // Set sigaction struct and linkLayer struct

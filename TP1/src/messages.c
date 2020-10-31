@@ -210,7 +210,7 @@ int readFrameI(int fd, unsigned char *frame){
             frame[length++] = byte;
         }
     }
-
+    linklayer.stats.numReceivedFramesI++;
     return length;
 }
 
@@ -231,22 +231,26 @@ int readAck(int fd){
     if(linklayer.sequenceNumber == 0 && control_field == C_RR1){
         printf("Received RR1\n");
         linklayer.sequenceNumber = 1;
+        linklayer.stats.numReceivedRR++;
         return 0;
     }
 
     else if(linklayer.sequenceNumber == 1 && control_field == C_RR0){
         printf("Received RR0\n");
         linklayer.sequenceNumber = 0;
+        linklayer.stats.numReceivedRR++;
         return 0;
     }
 
     else if(control_field == C_REJ0){
         printf("Received REJ0\n");
+        linklayer.stats.numReceivedREJ++;
         return -1;
     }
 
     else if(control_field == C_REJ1){
         printf("Received REJ1\n");
+        linklayer.stats.numReceivedREJ++;
         return -1;
     }
 
@@ -296,6 +300,7 @@ int writeStuffedFrame(int fd, unsigned char *buffer, int length) {
 
     frame[frameIndex++] = FLAG;
     write(fd, frame, frameIndex);
+    linklayer.stats.numSentFramesI++;
 
     return frameIndex;
 }
