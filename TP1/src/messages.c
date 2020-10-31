@@ -205,7 +205,7 @@ int readFrameI(int fd, unsigned char *frame){
         else{
             processFrameI(&state, byte);
 
-            if(state == FLAG && length !=0) length = 0;
+            if(state == FLAG_RCV && length !=0) length = 0;
 
             frame[length++] = byte;
         }
@@ -242,17 +242,14 @@ int readAck(int fd){
 
     else if(control_field == C_REJ0){
         printf("Received REJ0\n");
-        linklayer.numTransmissions++;
         return -1;
     }
 
     else if(control_field == C_REJ1){
         printf("Received REJ1\n");
-        linklayer.numTransmissions++;
         return -1;
     }
 
-    printf("Received Ack error\n");
     return -1;
 }
 

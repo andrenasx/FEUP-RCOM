@@ -10,7 +10,7 @@ void setDataLinkLayer(int port, int flag){
     linklayer.flag = flag;
     linklayer.numTransmissions = 0;
     linklayer.alarm = 0;
-    linklayer.timeout = 1;
+    linklayer.timeout = 3;
     linklayer.sequenceNumber = 0;
 }
 
@@ -191,7 +191,11 @@ int llwrite(int fd, unsigned char* buffer, int length){
         writeStuffedFrame(fd, buffer, length);
         setAlarm();
         // Read receiver ACK
-        readAck(fd);
+        if(readAck(fd) == -1){
+            unsetAlarm();
+            linklayer.alarm = 1;
+            continue;
+        }
     }while(linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
     unsetAlarm();
@@ -240,7 +244,7 @@ int llread(int fd, unsigned char *buffer) {
                     printf("Sent REJ1\n");
                 }
 
-                return 0;
+                return -1;
             }
 
             else {
