@@ -1,6 +1,4 @@
 // Frame Macros
-#define SET_SIZE 5  // tamanho em bytes da trama SET
-#define UA_SIZE 5  // tamanho em bytes da trama UA
 
 #define FLAG 0x7e  // Flag de inicio e fim
 #define ESCAPE 0x7d // Octeto de escape
@@ -23,4 +21,4 @@
 
 #define VERIFY_C(c) (c == C_SET || c == C_DISC || c == C_UA || c == C_RR0 || c == C_RR1 || c == C_REJ0 || c == C_REJ1) ? 1 : 0
 
-#define MAX_SIZE 1024
+#define MAX_SIZE 480

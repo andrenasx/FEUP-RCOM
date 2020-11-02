@@ -115,14 +115,15 @@ int receiveFile(int fd, char *dest){
 			break;
 		}
 		else if(packet[0] == C_START){
-			if (readControlPacket(packet)!= -1) printf("\n***Received START Control Packet successfully***\n\n");
+			if (readControlPacket(packet) > 0) printf("\n***Received START Control Packet successfully***\n\n");
+			else return -1;
 		}
 		else if(packet[0] == C_DATA){
-			if (readDataPacket(packet)!= -1) printf("\n***Received DATA Packet successfully***\n\n");
+			if (readDataPacket(packet) != -1) printf("\n***Received DATA Packet successfully***\n\n");
 		}
 	}
-	close(applayer.rec_file_fd);
-	return 0;
+
+	return close(applayer.rec_file_fd);;
 }
 
 int readControlPacket(unsigned char *packet){
@@ -170,6 +171,10 @@ int readControlPacket(unsigned char *packet){
 	strcat(applayer.recFileName, file_name);
 
 	applayer.rec_file_fd = open(applayer.recFileName, O_RDWR | O_CREAT, 0777);
+	if(applayer.rec_file_fd < 0){
+		printf("Error opening file\n");
+		return -1;
+	}
 
 	return applayer.rec_file_fd;
 }
@@ -190,7 +195,7 @@ int readDataPacket(unsigned char *packet){
 int main(int argc, char** argv) {
 	// Parse Args
     if(argc != 4){
-        printf("Usage: ./main <receiver/transmitter> <destination/filename> <port={0,1,10,11}>\n");
+        printf("Usage: ./application <receiver/transmitter> <destination/filename> <port={0,1,10,11}>\n");
 	    exit(1);
     }
 

@@ -1,37 +1,38 @@
 #include "messages.h"
 
+unsigned char set[5] = {FLAG, A_ER, C_SET, BCC(A_ER, C_SET), FLAG};
+unsigned char ua[5] = {FLAG, A_ER, C_UA, BCC(A_ER, C_UA), FLAG};
+unsigned char disc[5] = {FLAG, A_ER, C_DISC, BCC(A_ER, C_DISC), FLAG};
+unsigned char rr0[5] = {FLAG, A_ER, C_RR0, BCC(A_ER, C_RR0), FLAG};
+unsigned char rr1[5] = {FLAG, A_ER, C_RR1, BCC(A_ER, C_RR1), FLAG};
+unsigned char rej0[5] = {FLAG, A_ER, C_REJ0, BCC(A_ER, C_REJ0), FLAG};
+unsigned char rej1[5] = {FLAG, A_ER, C_REJ1, BCC(A_ER, C_REJ1), FLAG};
+
 int sendSET(int fd) {
-    unsigned char set[5] = {FLAG, A_ER, C_SET, BCC(A_ER, C_SET), FLAG};
-    return write(fd, set, SET_SIZE);
+    return write(fd, set, 5);
 }
 
 int sendUA(int fd){
-    unsigned char ua[5] = {FLAG, A_ER, C_UA, BCC(A_ER, C_UA), FLAG};
-    return write(fd, ua, UA_SIZE);
+    return write(fd, ua, 5);
 }
 
 int sendDISC(int fd){
-    unsigned char disc[5] = {FLAG, A_ER, C_DISC, BCC(A_ER, C_DISC), FLAG};
     return write(fd, disc, 5);
 }
 
 int sendRR0(int fd){
-    unsigned char rr0[5] = {FLAG, A_ER, C_RR0, BCC(A_ER, C_RR0), FLAG};
     return write(fd, rr0, 5);
 }
 
 int sendRR1(int fd){
-    unsigned char rr1[5] = {FLAG, A_ER, C_RR1, BCC(A_ER, C_RR1), FLAG};
     return write(fd, rr1, 5);
 }
 
 int sendREJ0(int fd){
-    unsigned char rej0[5] = {FLAG, A_ER, C_REJ0, BCC(A_ER, C_REJ0), FLAG};
     return write(fd, rej0, 5);
 }
 
 int sendREJ1(int fd){
-    unsigned char rej1[5] = {FLAG, A_ER, C_REJ1, BCC(A_ER, C_REJ1), FLAG};
     return write(fd, rej1, 5);
 }
 
@@ -303,10 +304,7 @@ int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_fram
     for(frameIndex=4; frameIndex < length-1; frameIndex++){
         if(frame[frameIndex] == ESCAPE){
             frameIndex++;
-            if(frame[frameIndex] == (FLAG ^ STUFFING))
-                destuffed_frame[dframeIndex] = FLAG;
-            else if(frame[frameIndex] == (ESCAPE ^ STUFFING))
-                destuffed_frame[dframeIndex] = ESCAPE;
+            destuffed_frame[dframeIndex] = frame[frameIndex] ^ STUFFING;
         }
         else{
             destuffed_frame[dframeIndex] = frame[frameIndex];

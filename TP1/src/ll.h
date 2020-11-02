@@ -18,8 +18,7 @@
 #define RECEIVER 1
 #define MAX_TRANSMISSIONS 3
 
-typedef struct 
-{
+typedef struct {
     unsigned int numSentFramesI;
     unsigned int numReceivedFramesI;
     unsigned int numTimeouts;
@@ -28,7 +27,7 @@ typedef struct
     unsigned int numSentREJ;
     unsigned int numReceivedREJ;
     struct timespec start, end;
-}statistics;
+} statistics;
 
 typedef struct {
     char port[20]; // /dev/ttySx
@@ -37,13 +36,13 @@ typedef struct {
     unsigned int timeout;
     unsigned int numTransmissions; //atempt number in case of failure
     unsigned int alarm;
-    char frame[256]; //trama
     statistics stats;
 } linkLayer;
 
 extern linkLayer linklayer;
 
-void setDataLinkLayer(int port, int flag);
+statistics initStatistics();
+void initDataLinkLayer(int port, int flag);
 
 //ll functions
 int llopen(int port, int flag);

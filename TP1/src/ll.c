@@ -3,16 +3,7 @@
 struct termios oldtio, newtio;
 linkLayer linklayer;
 
-void setDataLinkLayer(int port, int flag){
-    char porta[12];
-    snprintf(porta, 12, "/dev/ttyS%d", port);
-    strcpy(linklayer.port, porta);
-    linklayer.flag = flag;
-    linklayer.numTransmissions = 0;
-    linklayer.alarm = 0;
-    linklayer.timeout = 3;
-    linklayer.sequenceNumber = 0;
-
+statistics initStatistics() {
     statistics stats;
     stats.numSentFramesI = 0;
     stats.numReceivedFramesI = 0;
@@ -24,7 +15,20 @@ void setDataLinkLayer(int port, int flag){
 		printf("Error in start clock_gettime\n");
 		exit(-1);
     }
-    linklayer.stats = stats;
+
+    return stats;
+}
+
+void initDataLinkLayer(int port, int flag){
+    char porta[12];
+    snprintf(porta, 12, "/dev/ttyS%d", port);
+    strcpy(linklayer.port, porta);
+    linklayer.flag = flag;
+    linklayer.numTransmissions = 0;
+    linklayer.alarm = 0;
+    linklayer.timeout = 3;
+    linklayer.sequenceNumber = 0;
+    linklayer.stats = initStatistics();
 }
 
 int openSerial(){
@@ -69,11 +73,6 @@ int openSerial(){
 }
 
 int closeSerial(int fd){
-    if(clock_gettime(CLOCK_MONOTONIC, &linklayer.stats.end) < 0) {
-		printf("Error in end clock_gettime\n");
-		exit(-1);
-    }
-
     tcflush(fd, TCIOFLUSH);
 
     if (tcsetattr(fd,TCSANOW,&oldtio) == -1) {
@@ -89,7 +88,7 @@ int closeSerial(int fd){
 int llopen(int port, int flag){
     int fd;
     
-    setDataLinkLayer(port, flag);
+    initDataLinkLayer(port, flag);
     fd = openSerial();
 
     if(linklayer.flag == TRANSMITTER){
@@ -213,6 +212,12 @@ int llclose(int fd){
 
     printf("\n***Terminated Connection***\n\n");
 
+    if(clock_gettime(CLOCK_MONOTONIC, &linklayer.stats.end) < 0) {
+		printf("Error in end clock_gettime\n");
+		exit(-1);
+    }
+
+    sleep(1);
 	return closeSerial(fd);
 }
 
