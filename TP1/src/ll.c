@@ -26,7 +26,7 @@ void initDataLinkLayer(int port, int flag){
     linklayer.flag = flag;
     linklayer.numTransmissions = 0;
     linklayer.alarm = 0;
-    linklayer.timeout = 3;
+    linklayer.timeout = TIMEOUT;
     linklayer.sequenceNumber = 0;
     linklayer.stats = initStatistics();
 }

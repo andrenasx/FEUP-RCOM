@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "macros.h"
+#include "msg_macros.h"
 #include "ll.h"
 
 enum states {START, FLAG_RCV, A_RCV, C_RCV, BCC_OK, DATA, STOP};

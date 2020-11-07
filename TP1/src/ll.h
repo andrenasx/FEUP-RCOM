@@ -16,6 +16,8 @@
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define TRANSMITTER 0
 #define RECEIVER 1
+
+#define TIMEOUT 5
 #define MAX_TRANSMISSIONS 3
 
 typedef struct {
