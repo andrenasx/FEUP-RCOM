@@ -14,6 +14,7 @@ enum states {START, FLAG_RCV, A_RCV, C_RCV, BCC_OK, DATA, STOP};
 
 int sendSET(int fd);
 int sendUA(int fd);
+int sendUA_last(int fd);
 int sendDISC(int fd);
 int sendRR0(int fd);
 int sendRR1(int fd);

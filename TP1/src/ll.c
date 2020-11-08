@@ -202,7 +202,7 @@ int llclose(int fd){
         }
         linklayer.numTransmissions=0;
 
-        if (sendUA(fd) == -1){
+        if (sendUA_last(fd) == -1){
             printf("Error sending UA\n");
         }
         else {

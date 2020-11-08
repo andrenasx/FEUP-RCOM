@@ -2,18 +2,23 @@
 
 unsigned char set[5] = {FLAG, A_ER, C_SET, BCC(A_ER, C_SET), FLAG};
 unsigned char ua[5] = {FLAG, A_ER, C_UA, BCC(A_ER, C_UA), FLAG};
+unsigned char ua_last[5] = {FLAG, A_RE, C_UA, BCC(A_RE, C_UA), FLAG};
 unsigned char disc[5] = {FLAG, A_ER, C_DISC, BCC(A_ER, C_DISC), FLAG};
 unsigned char rr0[5] = {FLAG, A_ER, C_RR0, BCC(A_ER, C_RR0), FLAG};
 unsigned char rr1[5] = {FLAG, A_ER, C_RR1, BCC(A_ER, C_RR1), FLAG};
 unsigned char rej0[5] = {FLAG, A_ER, C_REJ0, BCC(A_ER, C_REJ0), FLAG};
 unsigned char rej1[5] = {FLAG, A_ER, C_REJ1, BCC(A_ER, C_REJ1), FLAG};
 
-int sendSET(int fd) {
+int sendSET(int fd){
     return write(fd, set, 5);
 }
 
 int sendUA(int fd){
     return write(fd, ua, 5);
+}
+
+int sendUA_last(int fd){
+    return write(fd, ua_last, 5);
 }
 
 int sendDISC(int fd){
@@ -37,6 +42,7 @@ int sendREJ1(int fd){
 }
 
 unsigned char processFrameSU(enum states *state, unsigned char byte){
+    static unsigned char a = 0;
     static unsigned char c = 0;
     switch (*state) {
         case START:
@@ -46,8 +52,9 @@ unsigned char processFrameSU(enum states *state, unsigned char byte){
             break;
 
         case FLAG_RCV:
-            if (byte == A_ER) {
+            if (byte == A_ER || byte == A_RE) {
                 *state = A_RCV;
+                a = byte;
             }
             else if (byte!= FLAG){
                 *state = START;
@@ -68,7 +75,7 @@ unsigned char processFrameSU(enum states *state, unsigned char byte){
             break;
 
         case C_RCV:
-            if (byte == BCC(A_ER,c)){
+            if (byte == BCC(a,c)){
                 *state = BCC_OK;
             }
             else if (byte == FLAG){
