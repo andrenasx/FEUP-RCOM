@@ -9,9 +9,6 @@ all: application
 %.o: %.c $(DEPS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-cable:
-	$(CC) $(CFLAGS) -o $@ src/$@.c
-
 application: $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $@ src/$@.c -lm
 
