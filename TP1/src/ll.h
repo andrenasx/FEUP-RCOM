@@ -11,7 +11,7 @@
 #include "messages.h"
 #include "alarm.h"
 
-#define BAUDRATE B19200
+#define BAUDRATE B57600
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define TRANSMITTER 0
