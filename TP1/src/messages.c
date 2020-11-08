@@ -209,7 +209,7 @@ int readFrameI(int fd, unsigned char *frame){
         frame[length++] = byte;
     }
 
-    generateBCC2Error(frame, 20);
+    generateBCC2Error(frame, 25);
 
     linklayer.stats.numReceivedFramesI++;
     return length;
