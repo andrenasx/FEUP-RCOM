@@ -255,7 +255,7 @@ int llread(int fd, unsigned char *buffer) {
 
     while(!received){
         if((frame_length = readFrameI(fd, frame))){
-            sleep(1);
+            sleep(2);
             printf("Received Frame\n");	
             control = frame[2];
 
