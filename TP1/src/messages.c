@@ -126,7 +126,7 @@ void processFrameI(enum states *state, unsigned char byte){
             if ((byte==C_I0 && linklayer.sequenceNumber==0) || (byte==C_I1 && linklayer.sequenceNumber==1)) {
                 *state = C_RCV;
                 c = byte;
-                generateBCC1Error(&c, 25);
+                //generateBCC1Error(&c, 5);
             }
             else if (byte == FLAG){
                 *state = FLAG_RCV;
@@ -209,7 +209,7 @@ int readFrameI(int fd, unsigned char *frame){
         frame[length++] = byte;
     }
 
-    //generateBCC2Error(frame, 5);
+    generateBCC2Error(frame, 5);
 
     linklayer.stats.numReceivedFramesI++;
     return length;
