@@ -126,6 +126,7 @@ void processFrameI(enum states *state, unsigned char byte){
             if ((byte==C_I0 && linklayer.sequenceNumber==0) || (byte==C_I1 && linklayer.sequenceNumber==1)) {
                 *state = C_RCV;
                 c = byte;
+                generateBCC1Error(&c, 5);
             }
             else if (byte == FLAG){
                 *state = FLAG_RCV;
@@ -207,6 +208,9 @@ int readFrameI(int fd, unsigned char *frame){
 
         frame[length++] = byte;
     }
+
+    //generateBCC2Error(frame, 5);
+
     linklayer.stats.numReceivedFramesI++;
     return length;
 }
@@ -323,4 +327,25 @@ int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_fram
     destuffed_frame[dframeIndex++] = frame[frameIndex++]; // FLAG
 
     return dframeIndex;
+}
+
+void generateBCC1Error(unsigned char *c, int percentage){
+  int prob = (rand() % 100) + 1;
+
+  if (prob <= percentage)
+  {
+    unsigned char randomByte = (unsigned char)((rand() % 177));
+    *c = randomByte;
+    printf("Generated BCC1 with errors\n\n");
+  }
+}
+
+void generateBCC2Error(unsigned char *frame, int percentage){
+  int prob = (rand() % 100) + 1;
+
+  if (prob <= percentage){
+    unsigned char randomByte = (unsigned char)((rand() % 177));
+    frame[4] = randomByte;
+    printf("Generated BCC2 with errors\n\n");
+  }
 }

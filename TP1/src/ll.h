@@ -17,7 +17,7 @@
 #define TRANSMITTER 0
 #define RECEIVER 1
 
-#define TIMEOUT 5
+#define TIMEOUT 3
 #define MAX_TRANSMISSIONS 3
 
 typedef struct {

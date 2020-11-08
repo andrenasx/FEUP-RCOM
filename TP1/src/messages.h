@@ -31,3 +31,6 @@ int readAck(int fd);
 
 int writeStuffedFrame(int fd, unsigned char *buffer, int length);
 int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_frame);
+
+void generateBCC1Error(unsigned char *c, int percentage);
+void generateBCC2Error(unsigned char *frame, int percentage);

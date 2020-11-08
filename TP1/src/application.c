@@ -41,7 +41,7 @@ int sendFile(int fd, char *file_name){
 		printf("Error in end clock_gettime\n");
 		exit(-1);
     }
-	printf("Time sending data packets: %f seconds\n", (double)(end.tv_sec - start.tv_sec) + ((double)(end.tv_nsec - start.tv_nsec)/1000000000.0));
+	printf("Time sending data packets: %f seconds\n\n", (double)(end.tv_sec - start.tv_sec) + ((double)(end.tv_nsec - start.tv_nsec)/1000000000.0));
 
 	// Send End Control Packet
 	if(sendControlPacket(C_END) == -1){
