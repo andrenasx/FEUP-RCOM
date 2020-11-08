@@ -126,7 +126,7 @@ void processFrameI(enum states *state, unsigned char byte){
             if ((byte==C_I0 && linklayer.sequenceNumber==0) || (byte==C_I1 && linklayer.sequenceNumber==1)) {
                 *state = C_RCV;
                 c = byte;
-                generateBCC1Error(&c, 15);
+                generateBCC1Error(&c, 20);
             }
             else if (byte == FLAG){
                 *state = FLAG_RCV;
