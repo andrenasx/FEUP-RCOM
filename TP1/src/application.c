@@ -119,7 +119,6 @@ int receiveFile(int fd, char *dest){
 	while(1){
 		if(llread(fd,packet) <= 0){
 			printf("Error reading the packet\n");
-			tcflush(fd, TCIFLUSH);
         	continue;
 		}
 		if(packet[0] == C_END){
