@@ -1,6 +1,7 @@
 #include "application.h"
 
 applicationLayer applayer;
+struct timespec start, end;
 
 int sendFile(int fd, char *file_name){
 	applayer.sent_file_fd = open(file_name, O_RDONLY);
@@ -25,11 +26,22 @@ int sendFile(int fd, char *file_name){
 		return -1;
 	}
 
+	if(clock_gettime(CLOCK_MONOTONIC, &start) < 0) {
+		printf("Error in start clock_gettime\n");
+		return -1;
+    }
+
 	// Send Data Packets
 	if (sendDataPacket() == -1) {
 		printf("Error sending Data Packets\n");
 		return -1;
 	}
+
+	if(clock_gettime(CLOCK_MONOTONIC, &end) < 0) {
+		printf("Error in end clock_gettime\n");
+		exit(-1);
+    }
+	printf("Time sending data packets: %f seconds\n", (double)(end.tv_sec - start.tv_sec) + ((double)(end.tv_nsec - start.tv_nsec)/1000000000.0));
 
 	// Send End Control Packet
 	if(sendControlPacket(C_END) == -1){
