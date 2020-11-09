@@ -22,8 +22,16 @@ void setAlarm() {
     sigaction(SIGALRM, &sa, NULL);
 
     linklayer.alarm = 0;
+}
 
+void startAlarm() {
+    linklayer.alarm = 0;
     alarm(linklayer.timeout); // start alarm
+}
+
+void stopAlarm() {
+    linklayer.alarm = 0;
+    alarm(0); // uninstall alarm
 }
 
 
@@ -35,6 +43,4 @@ void unsetAlarm() {
     sigaction(SIGALRM, &sa, NULL);
 
     linklayer.alarm = 0;
-
-    alarm(0); // uninstall alarm
 }

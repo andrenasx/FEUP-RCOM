@@ -91,6 +91,8 @@ int llopen(int port, int flag){
     initDataLinkLayer(port, flag);
     fd = openSerial();
 
+    setAlarm();
+
     if(linklayer.flag == TRANSMITTER){
         do {
             if (sendSET(fd) == -1){
@@ -100,7 +102,7 @@ int llopen(int port, int flag){
                 printf("Sent SET\n");
             }
 
-            setAlarm();
+            startAlarm();
 
             if(readResponse(fd) == -1){
                 printf("Error receiving UA\n");
@@ -112,7 +114,7 @@ int llopen(int port, int flag){
         } while (linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
 
-        unsetAlarm();
+        stopAlarm();
         if(linklayer.numTransmissions >= MAX_TRANSMISSIONS){
             printf("Reached max retries\n");
             return -1;
@@ -184,7 +186,7 @@ int llclose(int fd){
                 printf("Sent DISC\n");
         	}
 
-			setAlarm();
+			startAlarm();
 
 			//read DISC
 			if(readResponse(fd) == -1){
@@ -195,7 +197,7 @@ int llclose(int fd){
        		} 
 		}while (linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
-		unsetAlarm();
+		stopAlarm();
         if(linklayer.numTransmissions >= MAX_TRANSMISSIONS){
             printf("Reached max retries\n");
             return -1;
@@ -217,6 +219,7 @@ int llclose(int fd){
 		exit(-1);
     }
 
+    unsetAlarm();
     sleep(1);
 	return closeSerial(fd);
 }
@@ -225,16 +228,16 @@ int llwrite(int fd, unsigned char* buffer, int length){
     do{
         // Send frame
         if (writeStuffedFrame(fd, buffer, length)) printf("Sent Frame\n");
-        setAlarm();
+        startAlarm();
         // Read receiver ACK
         if(readAck(fd) == -1){
-            unsetAlarm();
+            stopAlarm();
             linklayer.alarm = 1;
             continue;
         }
     }while(linklayer.numTransmissions < MAX_TRANSMISSIONS && linklayer.alarm);
 
-    unsetAlarm();
+    stopAlarm();
     if(linklayer.numTransmissions >= MAX_TRANSMISSIONS){
         printf("Reached max retries\n");
         return -1;

@@ -6,4 +6,6 @@
 
 void alarmHandler(int signal);
 void setAlarm();
+void startAlarm();
+void stopAlarm();
 void unsetAlarm();
