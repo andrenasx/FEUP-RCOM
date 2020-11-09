@@ -241,12 +241,14 @@ int readAck(int fd){
 
     else if(control_field == C_REJ0){
         printf("Received REJ0\n");
+        linklayer.numTransmissions++;
         linklayer.stats.numReceivedREJ++;
         return -1;
     }
 
     else if(control_field == C_REJ1){
         printf("Received REJ1\n");
+        linklayer.numTransmissions++;
         linklayer.stats.numReceivedREJ++;
         return -1;
     }
