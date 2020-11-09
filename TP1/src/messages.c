@@ -172,7 +172,7 @@ int readCommand(int fd){
     unsigned char byte;
     enum states state = START;
 	
-    while (state != STOP) {       /* loop for input */
+    while (state != STOP) {
         read(fd,&byte,1);
         processFrameSU(&state, byte);
     }
@@ -199,7 +199,7 @@ int readFrameI(int fd, unsigned char *frame){
     int length = 0;
     enum states state = START;
 	
-    while (state != STOP) {       /* loop for input */
+    while (state != STOP) {
         read(fd,&byte,1);
 
         processFrameI(&state, byte);
@@ -332,8 +332,7 @@ int destuffFrame(unsigned char* frame, int length, unsigned char* destuffed_fram
 void generateBCC1Error(unsigned char *c, int percentage){
   int prob = (rand() % 100) + 1;
 
-  if (prob <= percentage)
-  {
+  if (prob <= percentage){
     unsigned char randomByte = (unsigned char)((rand() % 177));
     *c = randomByte;
     printf("Generated BCC1 with errors\n\n");

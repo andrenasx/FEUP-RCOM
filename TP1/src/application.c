@@ -228,6 +228,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
+	// Establish connection
     int fd = llopen(port, flag);
 	if(fd == -1){
 		printf("llopen error\n");
@@ -252,6 +253,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
+	// Close connection
 	if(llclose(fd) == -1){
 		printf("llclose error\n");
 		return -1;
