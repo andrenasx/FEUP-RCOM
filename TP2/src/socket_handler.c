@@ -36,3 +36,15 @@ int write_to_socket(const int sockfd, const char* buf, const size_t buf_size) {
     printf("Bytes written to server: %d\nInfo: %s\n", bytes, buf);
     return 0;
 }
+
+void read_from_socket(const int sockfd, char* buf, size_t buf_size){
+    FILE* fp = fdopen(sockfd, "r");
+
+	do {
+		memset(buf, 0, buf_size);
+		buf = fgets(buf, buf_size, fp);
+		printf("%s", buf);
+
+	} while (buf[0] < 0 || buf[0] > 5 || buf[3] != ' ');
+
+}
