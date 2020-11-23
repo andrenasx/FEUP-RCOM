@@ -2,7 +2,7 @@
 
 int open_socket(const char* ip_address, const int port) {
     int	sockfd;
-	struct	sockaddr_in server_addr;
+	struct sockaddr_in server_addr;
 	
 	/*server address handling*/
 	bzero((char*)&server_addr,sizeof(server_addr));
@@ -12,17 +12,27 @@ int open_socket(const char* ip_address, const int port) {
     
 	/*open an TCP socket*/
 	if ((sockfd = socket(AF_INET,SOCK_STREAM,0)) < 0) {
-    		perror("socket()");
-        	exit(0);
-    	}
+    	perror("socket()");
+        return -1;
+    }
 
 	/*connect to the server*/
-    	if(connect(sockfd, 
-	           (struct sockaddr *)&server_addr, 
-		   sizeof(server_addr)) < 0){
-        	perror("connect()");
-		exit(0);
+    if(connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0){
+        perror("connect()");
+		return -1;
 	}
 
     return sockfd;
+}
+
+int write_to_socket(const int sockfd, const char* buf, const size_t buf_size) {
+    int bytes;
+
+    if((bytes = write(sockfd, buf, strlen(buf))) <= 0){
+        perror("write to socket\n");
+        return -1;
+    }
+
+    printf("Bytes written to server: %d\nInfo: %s\n", bytes, buf);
+    return 0;
 }

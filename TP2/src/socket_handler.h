@@ -11,3 +11,4 @@
 #include <strings.h>
 
 int open_socket(const char* ip_address, const int port);
+int write_to_socket(const int sockfd, const char* buf, const size_t buf_size);
