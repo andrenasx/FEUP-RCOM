@@ -26,7 +26,7 @@ int parseURL(char* args, url_args *url) {
 
     url->path = path;
     url->user = user;
-    url->password = pass;
+    url->pass = pass;
   
     if (getIP(url) != 0){
         fprintf(stderr, "Error: getIp()\n");
@@ -70,10 +70,10 @@ int getFilename(url_args *url){
 
 void printURL(url_args url){
     printf("\nUser: %s\n", url.user);
-    printf("Password: %s\n", url.password);
+    printf("Password: %s\n", url.pass);
     printf("Host: %s\n", url.host);
     printf("Path: %s\n", url.path);
     printf("Filename: %s\n", url.filename);
     printf("Host name: %s\n", url.host_name);
-    printf("IP address: %s\n", url.ip);
+    printf("IP address: %s\n\n", url.ip);
 }

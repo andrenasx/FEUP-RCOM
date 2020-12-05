@@ -10,12 +10,11 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define MAX_STRING_SIZE 256
 #define h_addr h_addr_list[0]	//The first address in h_addr_list. 
 
 typedef struct {
-	char* user; 
-	char* password; 
+	char* user;
+	char* pass;
 	char* host;
 	char* path;
 	char* filename;
