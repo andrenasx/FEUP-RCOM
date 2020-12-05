@@ -1,0 +1,79 @@
+#include "url_parser.h"
+
+int parseURL(char* args, url_args *url) {
+    char* ftp = strtok(args, "/");      // ftp:
+    char* urlrest = strtok(NULL, "/");  // [<user>:<password>@]<host>
+    char* path = strtok(NULL, "");      // <url-path>
+
+    if (strcmp(ftp, "ftp:") != 0) {
+        fprintf(stderr, "Error: Not using ftp\n");
+        return -1;
+    }
+  
+    char* user = strtok(urlrest, ":");
+    char* pass = strtok(NULL, "@");
+
+
+    // no user:password given
+    if (pass == NULL) {
+        user = "anonymous";
+        pass = "pass";
+        url->host = urlrest;
+    }
+    else
+        url->host = strtok(NULL, "");
+  
+
+    url->path = path;
+    url->user = user;
+    url->password = pass;
+  
+    if (getIP(url) != 0){
+        fprintf(stderr, "Error: getIp()\n");
+        return -1;
+    }
+
+    if (getFilename(url) != 0){
+        fprintf(stderr, "Error: getFileName()\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int getIP(url_args *url){
+    struct hostent *h;
+
+    if ((h=gethostbyname(url->host)) == NULL) {  
+        herror("gethostbyname");
+        return -1;
+    }
+
+    url->host_name = h->h_name;
+    url->ip = inet_ntoa(*((struct in_addr*)h->h_addr));
+
+    return 0;
+}
+
+int getFilename(url_args *url){
+    char fullpath[524];
+    strcpy(fullpath, url->path);
+
+    char* token = strtok(fullpath, "/");
+    while(token != NULL) {
+        url->filename = token;
+        token = strtok(NULL, "/");
+    }
+
+    return 0;
+}
+
+void printURL(url_args url){
+    printf("\nUser: %s\n", url.user);
+    printf("Password: %s\n", url.password);
+    printf("Host: %s\n", url.host);
+    printf("Path: %s\n", url.path);
+    printf("Filename: %s\n", url.filename);
+    printf("Host name: %s\n", url.host_name);
+    printf("IP address: %s\n", url.ip);
+}

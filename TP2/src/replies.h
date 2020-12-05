@@ -11,3 +11,6 @@
 #define RETR_TRANSF_START_CODE  125 //Data connection already open; transfer starting.
 #define RETR_SUCCESS_CODE       226 //Closing data connection. Requested file action successful
 #define ACTION_FAILED_CODE      550 //Requested action not taken. File unavailable (e.g., file not found, no access).
+
+// Command Terminator
+#define CRLF "\r\n"
