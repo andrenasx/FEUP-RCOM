@@ -12,5 +12,5 @@
 
 int init_connection(char *ip, int port);
 int write_to_socket(int sockfd, char *message);
-int read_from_socket(int sockfd, int *response_code);
-int read_passivemode(int sockfd, int *response_code, char **ip, int *port);
+int read_from_socket(int sockfd);
+int read_passivemode(int sockfd, char *ip, int *port);

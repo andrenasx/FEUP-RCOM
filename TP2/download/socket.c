@@ -38,49 +38,49 @@ int write_to_socket(int sockfd, char *message) {
     return 0;
 }
 
-int read_from_socket(int sockfd, int *response_code){
+int read_from_socket(int sockfd){
     FILE* fp = fdopen(sockfd, "r");
 
 	char* buf;
 	size_t bytesRead = 0;
+	int response_code;
 
 	while(getline(&buf, &bytesRead, fp) > 0){
 		printf("< %s", buf);
 		if(buf[3] == ' '){
-			sscanf(buf, "%d", response_code);
+			sscanf(buf, "%d", &response_code);
 			break;
 		}
 	}
 
-	return 0;
+	return response_code;
 }
 
-int read_passivemode(int sockfd, int *response_code, char **ip, int *port){
+int read_passivemode(int sockfd, char *ip, int *port){
 	FILE* fp = fdopen(sockfd, "r");
 
 	char* buf;
 	size_t bytesRead = 0;
+	int response_code;
 
 	while(getline(&buf, &bytesRead, fp) > 0){
 		printf("< %s", buf);
 		if(buf[3] == ' '){
-			sscanf(buf, "%d", response_code);
+			sscanf(buf, "%d", &response_code);
 			break;
 		}
 	}
 
-	strtok(buf, "(");       
-	char* ip1 = strtok(NULL, ",");       // 193
-	char* ip2 = strtok(NULL, ",");       // 137
-	char* ip3 = strtok(NULL, ",");       // 29
-	char* ip4 = strtok(NULL, ",");       // 15
+	//parse ip address and port
+	char *find;
+	int ip1, ip2, ip3, ip4, p1, p2;
 
-  	sprintf(*ip, "%s.%s.%s.%s", ip1, ip2, ip3, ip4);	
-  
-	char* p1 = strtok(NULL, ",");       // 199
-	char* p2 = strtok(NULL, ")");       // 78
+	find = strrchr(buf, '(');
+	sscanf(find, "(%d,%d,%d,%d,%d,%d)", &ip1, &ip2, &ip3, &ip4, &p1, &p2);
 
-  	*port = atoi(p1)*256 + atoi(p2);
+	sprintf(ip, "%d.%d.%d.%d", ip1, ip2, ip3, ip4);
+
+  	*port = p1*256+p2;
   
-  	return 0;
+  	return response_code;
 }
