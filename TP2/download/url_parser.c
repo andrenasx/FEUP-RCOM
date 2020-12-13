@@ -60,12 +60,9 @@ int getIP(url_args *url){
 }
 
 int getFilename(url_args *url){
-    char fullpath[512];
-    strcpy(fullpath, url->path);
-
-    char* filename;
+    char* filename = url->path;
     char* p;
-    for(p = fullpath; *p; p++){
+    for(p = url->path; *p; p++){
         if(*p == '/' || *p == '\\' || *p == ':'){
             filename = p+1;
         }
