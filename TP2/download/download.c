@@ -14,8 +14,6 @@ int main(int argc, char* argv[]) {
     }
 
     printURL(url);
-    char filename[64];
-    strcpy(filename, url.filename);
 
     //init
     if(ftp_init(url.ip, 21) != 0){
@@ -36,7 +34,7 @@ int main(int argc, char* argv[]) {
     }
 
     //download file
-    if(ftp_download(url.path, filename) != 0){
+    if(ftp_download(url.path, url.filename) != 0){
         fprintf(stderr, "Error downloading file!\n");
         exit(1);
     }

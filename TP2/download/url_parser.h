@@ -13,13 +13,13 @@
 #define h_addr h_addr_list[0]	//The first address in h_addr_list. 
 
 typedef struct {
-	char* user;
-	char* pass;
-	char* host;
-	char* path;
-	char* filename;
-	char* host_name;
-	char* ip;
+	char user[256];
+	char pass[256];
+	char host[512];
+	char path[512];
+	char filename[512];
+	char host_name[512];
+	char ip[20];
 } url_args;
 
 int parseURL(char* args, url_args *url);

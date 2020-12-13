@@ -18,15 +18,16 @@ int parseURL(char* args, url_args *url) {
     if (pass == NULL) {
         user = "anonymous";
         pass = "pass";
-        url->host = urlrest;
+        strcpy(url->host, urlrest);
     }
-    else
-        url->host = strtok(NULL, "");
+    else {
+        char* host = strtok(NULL, "");
+        strcpy(url->host, host);
+    }
   
-
-    url->path = path;
-    url->user = user;
-    url->pass = pass;
+    strcpy(url->path, path);
+    strcpy(url->user, user);
+    strcpy(url->pass, pass);
   
     if (getIP(url) != 0){
         fprintf(stderr, "Error: getIp()\n");
@@ -49,21 +50,28 @@ int getIP(url_args *url){
         return -1;
     }
 
-    url->host_name = h->h_name;
-    url->ip = inet_ntoa(*((struct in_addr*)h->h_addr));
+    char* host_name = h->h_name;
+    strcpy(url->host_name, host_name);
+
+    char* ip = inet_ntoa(*((struct in_addr*)h->h_addr));
+    strcpy(url->ip, ip);
 
     return 0;
 }
 
 int getFilename(url_args *url){
-    char fullpath[524];
+    char fullpath[512];
     strcpy(fullpath, url->path);
 
-    char* token = strtok(fullpath, "/");
-    while(token != NULL) {
-        url->filename = token;
-        token = strtok(NULL, "/");
+    char* filename;
+    char* p;
+    for(p = fullpath; *p; p++){
+        if(*p == '/' || *p == '\\' || *p == ':'){
+            filename = p+1;
+        }
     }
+
+    strcpy(url->filename, filename);
 
     return 0;
 }
