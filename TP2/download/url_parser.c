@@ -1,9 +1,9 @@
 #include "url_parser.h"
 
 int parseURL(char* args, url_args *url) {
-    char* ftp = strtok(args, "/");      // ftp:
-    char* urlrest = strtok(NULL, "/");  // [<user>:<password>@]<host>
-    char* path = strtok(NULL, "");      // <url-path>
+    char* ftp = strtok(args, "/");
+    char* urlrest = strtok(NULL, "/");
+    char* path = strtok(NULL, "");
 
     if (strcmp(ftp, "ftp:") != 0) {
         fprintf(stderr, "Error: Not using ftp\n");
@@ -14,7 +14,7 @@ int parseURL(char* args, url_args *url) {
     char* pass = strtok(NULL, "@");
 
 
-    // no user:password given
+    // default user and pass
     if (pass == NULL) {
         user = "anonymous";
         pass = "pass";
