@@ -1,1 +1,1 @@
-# FEUP-RCOM-1st
+# FEUP-RCOM
